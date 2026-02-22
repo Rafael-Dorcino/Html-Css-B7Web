@@ -11,8 +11,8 @@
             font-size: 20px;
         }
 
-        a {
-            color: #ffce12;
+        .linkgoogle {
+            color: #927916;
         }
 
         li{
@@ -21,6 +21,10 @@
     </style>
 </head>
 <body>
+
+    <!-- Tag de comentario do HTML, explicação de alguma coisa, etc... -->
+
+    <a class="arealogin" href="#logarconta">Ir para a área de login da conta</a>
    <h1>Título da pagina</h1>
    <h2>Sub título</h2>
    <h3>Sub Sub Título</h3>
@@ -34,39 +38,53 @@
 
    <hr>
 
-   <a href="https://www.google.com/" style="font-size: 20px;">Ir para o site do Google</a>
+   <a class="linkgoogle" href="https://www.google.com" style="font-size: 20px;">Ir para o site do Google</a>
 
    <hr>
-
-   <img id="imagemgoogle" src="https://www.google.com/logos/google.jpg" alt="Logo do Google" width="100px">
-
+    <a href="https://www.google.com" target="_blank">
+        <img id="imagemgoogle" src="https://www.google.com/logos/google.jpg" alt="Logo do Google" width="100px">
+    </a>
    <hr>
 
     <button>Clique em mim</button>
 
     <hr>
 
-    <div>
-        <h3>lista de bolo</h3>
-        <ul>
-            <li>farinha</li>
-            <li>ovo</li>
-            <li>leite</li>
-            <li>óleo</li>
-            <li>fermento</li>
-            <li>margarina</li>
-        </ul>
+    <div class="caixalista">
+        <div class="lista1">
+            <h3>lista de bolo</h3>
+            <ul>
+                <li>farinha</li>
+                <li>ovo</li>
+                <li>leite</li>
+                <li>óleo</li>
+                <li>fermento</li>
+                <li>margarina</li>
+            </ul>
+        </div>
 
-        <h3>lista de chamada</h3>
-        <ol>
-            <li class="N-impar">Nubia</li>
-            <li class="N-par">Renato</li>
-            <li class="N-impar">Ester</li>
-            <li class="N-par">Andre</li>
-            <li class="N-impar">Osmarina</li>
-            <li class="N-par">Thaylon</li>
-        </ol>
+        <div class="lista2">
+            <h3>lista de chamada</h3>
+            <ol>
+                <li class="N-impar">Nubia</li>
+                <li class="N-par">Renato</li>
+                <li class="N-impar">Ester</li>
+                <li class="N-par">Andre</li>
+                <li class="N-impar">Osmarina</li>
+                <li class="N-par">Thaylon</li>
+            </ol>
+        </div>
     </div>
-    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Atque magnam reiciendis commodi alias. Fugit possimus natus maiores distinctio temporibus repellendus facere. Blanditiis delectus iure magnam saepe itaque ex possimus est!</p>
+    <p class="texto1"><mark>Lorem ipsum dolor sit</mark>, amet consectetur adipisicing elit. <strong>Atque magnam reiciendis commodi alias.</strong> Fugit possimus <sup>natus</sup> maiores distinctio temporibus <small>repellendus facere</small>. <em>Blanditiis</em> delectus iure <sub>magnam</sub> saepe itaque <del>ex possimus</del> est!</p>
+
+    <div class="caixamodular">
+
+    </div>
+
+    <hr>
+
+    <div id="logarconta" class="login">
+        <a class="linklogin" href="login.html" title="Página do login">Logar na conta</a>
+    </div>
 </body>
 </html> 

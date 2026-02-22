@@ -3,6 +3,12 @@ body {
     padding: 10px;
 }
 
+.arealogin{
+    color: rgb(76, 132, 235);
+    font-weight: bolder;
+    font-size: 20px;
+}
+
 button {
     color: rgb(255, 255, 255);
     background-color: cornflowerblue;
@@ -34,4 +40,58 @@ button {
 ul li {
     font-family: Arial, Helvetica, sans-serif;
     color: rgb(66, 66, 66);
+}
+
+.caixalista {
+    border: 3px solid black;
+    padding: 10px;
+    display: flex;
+    justify-content: space-around;
+    background-color: gray;
+    margin: 20px;
+}
+
+.lista1 {
+    border: 5px dashed green;
+    padding: 10px;
+    background-color: lightgray;
+}
+
+.lista2 {
+    border: 5px dotted rgb(226, 122, 3);
+    padding: 10px;
+    background-color: lightgray;
+}
+
+.texto1 {
+    margin: 50px;
+    font-size: 20px;
+    
+}
+.caixamodular {
+    background-color: darkolivegreen;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 3px solid black;
+}
+
+.login {
+    background-color: rgb(171, 193, 233);
+    border: 2px solid rgb(60, 121, 235);
+    padding: 15px;
+    width: 200px;
+    display: flex;
+    justify-content: center;
+}
+
+.linklogin {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bolder;
+    color: rgb(60, 121, 235);
+    
+}
+
+.login:hover {
+    background-color: aliceblue;
 }
