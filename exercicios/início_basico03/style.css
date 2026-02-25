@@ -8,6 +8,30 @@ body {
     background-color: lightgray;
 }
 
+table {
+    width: 600px;
+
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+table thead {
+    background-color: rgb(51, 51, 51);
+    color: white;
+}
+
+tbody > tr:hover {
+    background-color: darkgrey;
+    color: white;
+}
+
+tbody tr:nth-child(even) {
+    background-color: rgba(0, 183, 255, 0.329);
+}
+
 h1 {
     text-shadow: 6px 6px 4px rgb(255, 0, 0);
     font-family: "Betania Patmos In GDL", cursive;
