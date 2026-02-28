@@ -18,33 +18,82 @@
     <form action="paginas/login.html" method="get">
 
         <label for="nome">Nome :</label>
-        <input type="text" name="usuario" id="nome" value="" >
-
-        <br>
-
-        <label >Senha :
-            <input type="password" name="senha" id="senha">
+        <input type="text" name="usuario" id="nome" value="">
+        
+        <label  style="margin-top: 10px;">
+            Descrição: <br>
+            <textarea name="descricao" id="descricao"></textarea>
         </label>
 
-        <br>
+        <label>
+            Categoria: <br>
+            <select name="categoria" id="categoria">
+                <option value="1">Categoria 1</option>
+                <option value="2">Categoria 2</option>
+                <option value="3">Categoria 3</option>
+                <option value="4">Categoria 4</option>
+                <option value="5">Categoria 5</option>
+            </select>
+        </label>
 
-        <input type="submit" value="Enviar">
+        <label>
+            <input type="checkbox" name="termos" id="termos">
+            Eu declaro que li e aceito os <a href="pagina/termos.html" class="termoslink" target="_blank" >termos de uso.</a>
+        </label>
+
+        
+
+        <button>Enviar</button>
 
     </form>
+
     <hr>
-    <form action="index.html" method="get">
-        <select name="produtos" id="" size="2" multiple>
-            <option value=""></option>
-            <option value="Processador">Processador</option>
-            <option value="Placa_mae">Placa mae</option>
-            <option value="Placa_de_Video">Placa de Video</option>
-            <option value="Fontes">Fontes</option>
-            <option value="Cooler">Cooler</option>
-            <option value="Gabinete">Gabinete</option>
-        </select>
-        <input type="submit" value="Buscar">
+
+    <form action="#" method="get" enctype="multipart/form-data">
+
+        <input type="hidden" name="country" value="BR">
+
+        <fieldset>
+            <legend>Dados Pessoais</legend>
+            <label>
+                Primeiro nome : <br>
+                <input type="text" name="name" id="name" required minlength="3">
+            </label>
+            <label>
+                Sobrenome : <br>
+                <input type="text" name="sobrenome" id="sobrenome">
+            </label>
+            <label>
+                E-mail : <br>
+                <input type="text" name="email" id="email" required pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2}$ " title="Endereco de E-mail">
+            </label>
+            <label>
+                Idade :
+                <input type="number" name="idade" id="idade" min="18" max="50">
+            </label>
+            <label>
+                Foto : <br>
+                <input type="file" name="foto" accept="image/*">
+            </label>
+        </fieldset>
+
+        <fieldset>
+            <legend>Dados Profissionais</legend>
+            <label>
+                Nome da empresa : <br>
+                <input type="text" name="companyname" id="companynema">
+            </label>
+            <label>
+                Cargo na empresa : <br>
+                <input type="text" name="companyjob" id="companyjob">
+            </label>
+        </fieldset>
+
+        <input type="submit" value="Cadastrar" class="cadastro">
     </form>
+
     <hr>
+
     <form action="index.html" method="get">
         <textarea name="descricao" id="" style="width: 400px; height: 200px;"></textarea>
         <input type="submit" value="Enviar">
@@ -81,7 +130,7 @@
             </tr>
         </tbody>
     </table>
-
+<hr>
     <p>
         <a href="#">Lorem ipsum</a> dolor sit amet consectetur adipisicing elit. Autem est aut nihil quos. Ratione quaerat molestiae at ipsam quia consequuntur. Nihil autem officiis veritatis magni sapiente nemo ullam, eligendi aut? Lorem ipsum dolor sit amet, consectetur adipisicing elit. Velit debitis corrupti minus natus? Nisi, ut. Quidem, veniam repudiandae alias et ipsa in quas culpa nulla rerum cum esse veritatis non!
     </p>
