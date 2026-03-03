@@ -1,0 +1,13 @@
+body {
+    font-size: 20px;
+}
+
+.box {
+    font-size: 3em;
+}
+
+.box-interno {
+    width: 10em;
+    height: 10em;
+    background-color: burlywood;
+}
