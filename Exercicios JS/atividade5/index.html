@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercício de funções #5</title>
+</head>
+<body>
+    <h1>Exercício de funções #5</h1>
+    <script>
+        /*
+        
+        Calcule o preço do imóvel
+        - m2 = 3.000
+        - Se tiver 1 quarto, o m2 é 1x
+        - Se tiver 2 quartos, o m2 é 1.2x
+        - Se tiver 3 quartos, o m2 é 1.5x
+        Uso da fonção
+        
+        */
+
+        function calcularImovel(metragem, quartos) {
+            let m2 = 3000;
+            let preco = 0;
+            switch (quartos) {
+                case 1:
+                    preco = metragem * m2;
+                break;
+
+                case 2:
+                    preco = metragem * (m2 * 1.2) ;
+                break;
+
+                case 3:
+                    preco = metragem * (m2 * 1.5);
+                break;
+            }
+
+            return preco;
+            
+        }
+
+        let metragem = 123;
+        let quartos = 3;
+        let preco = calcularImovel(metragem, quartos);
+        if (quartos <= 3){
+            console.log(`A casa custa R$: ${preco}`)
+        } else {
+            console.log("O maxímo de quartos é 3!")
+        }
+    </script>
+</body>
+</html>

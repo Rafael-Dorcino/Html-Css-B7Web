@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercício de funções #6 (mais fácil)</title>
+</head>
+<body>
+    <h1>Exercício de funções #6 (mais fácil)</h1>
+
+    <script>
+        /*
+        
+        Crie uma função que valida usuário e senha.
+        Usuário correto: Rafael
+        Senha correta: 123
+
+        */
+
+        // Uso de função
+
+        function validar(usuario, senha){
+            if( usuario === "Rafael" && senha === '123') {
+                return true
+            } else {
+                return false
+            }
+        }
+
+        let usuario = 'Rafael'
+        let senha = '123'
+        let validacao = validar(usuario, senha)
+        if(validacao) {
+            console.log('Acesso concedido.')
+        } else {
+            console.log('Acesso NEGADO!')
+        }
+    </script>
+</body>
+</html>
