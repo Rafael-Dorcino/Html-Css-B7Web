@@ -28,3 +28,8 @@ header {
 .menu {
 
 }
+
+nav ul, nav li {
+    list-style: none;
+    margin: 0;
+}
