@@ -1,0 +1,37 @@
+/*
+
+.quicksand-<uniquifier> {
+  font-family: "Quicksand", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+}
+}
+
+
+*/
+
+*, img, div{
+  margin: 0px;
+  padding: 0px;
+}
+
+body {
+  background-color: rgb(135, 135, 0);
+  font-family: "Quicksand", sans-serif;
+  font-size: 20px;
+  font-optical-sizing: auto;
+  font-weight: bold;
+  font-style: normal;
+  
+}
+
+div img{
+  background-color: black;
+  width: 75px;
+}
+
+body {
+  background-image: url(imagens/fundo.pn);
+
+}
