@@ -17,7 +17,7 @@
 }
 
 body {
-  background-color: rgb(135, 135, 0);
+  background-color: #ffdb7e;
   font-family: "Quicksand", sans-serif;
   font-size: 20px;
   font-optical-sizing: auto;
@@ -32,6 +32,6 @@ div img{
 }
 
 body {
-  background-image: url(imagens/fundo.pn);
+  background-image: url(imagens/Fundo\ de\ favo.pn);
 
 }
