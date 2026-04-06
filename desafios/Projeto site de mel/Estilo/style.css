@@ -26,12 +26,15 @@ body {
   
 }
 
-div img{
-  background-color: black;
-  width: 75px;
+body {
+  background-image: url(imagens/);
+  background-repeat: repeat-x;
 }
 
-body {
-  background-image: url(imagens/Fundo\ de\ favo.pn);
-
+header{
+  background-color: aqu;
+  border:1px solid red;
+  width: 80vw;
+  height: 650px;
+  margin: auto;
 }
