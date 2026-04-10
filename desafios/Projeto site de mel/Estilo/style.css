@@ -39,8 +39,47 @@ header{
   border:1px solid red;
   width: 80vw;
   height: 650px;
-  margin: auto;
+}
+
+.menu {
+  display: flex;
+  flex-flow: wrap nowrap;
+  justify-content: space-between;
   
+  width: 100%;
+}
+
+.logo {
+  border:1px solid red;
+  height: 300px;
+  : 200px;
+  border-radius: 0px 0px 50% 50%;
+  background-color: white;
+}
+
+.logo img{
+  width: 200px;
+  display: flex;
+}
+
+nav {
+  background-color: white;
+  height: 100;
+  height: 100px;
+}
+
+nav ul{
+  display: flex;
+  list-style-type: none;
+  border:1px solid red;
+}
+
+nav ul li {
+  padding: 0px 20px;
+}
+
+nav ul li a {
+  text-decoration: none;
 }
 
 main{
@@ -62,26 +101,80 @@ main{
 
 section {
   display: flex;
-  justify-content: center;
+  
   justify-content: space-around;
+  align-content: space-between;
   flex-flow: row wrap;
   margin-top: 110px;
 }
 
-.produtos {
-  background-color: rgb(255, 137, 3);
-  width: 300px;
-  height: 400px;
+article {
   display: flex;
   justify-content: center;
+  align-items: center;
+  background-color: white;
+  width: 300px;
+  height: 380px;
+  padding: 10px;
   margin: 20px;
+  border-radius: 20px;
 }
 
-img {
-  width: 250px;
-  height: 250px;
-  margin-top: 10px;
+
+
+.produtos {
+  background-image: linear-gradient(to bottom right, #EC4E20, #E65100, #FF851B, #FF9E00, #FFC300);
+  width: 300px;
+  height: 380px;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.produtos:hover {
+  background-image: linear-gradient(to bottom right,#FFC300 ,  #FF9E00, #FF851B, #E65100, #EC4E20);
   
+  
+}
+
+article:hover {
+  background-image: linear-gradient(to bottom right,#FFC300 ,  #FF9E00, #FF851B, #E65100, #EC4E20);
+  
+}
+
+section div.produtos h3 {
+  color: white;
+  font-size: 22px;
+  text-align: center;
+}
+
+section div.produtos p {
+  color: rgb(0, 0, 0);
+  font-family: "Quicksand", sans-serif;
+  font-size: 15px;
+  text-align: justify;
+  padding: 0px 20px;
+}
+
+section div.produtos h3.preco {
+  color: black;
+  background-color: white;
+  padding: 5px;
+  align-self: flex-end;
+  border-radius: 9px 0px;
+  float: inline-end;
+  
+}
+
+.fotoproduto {
+  width: 200px;
+  height: 200px;
+  margin-top: 10px;
+  border: 3px solid white;
+  border-radius: 20px 0px;
 }
 
 footer {
