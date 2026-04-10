@@ -35,8 +35,8 @@ body {
 }
 
 header{
-  background-color: aqu;
-  border:1px solid red;
+  background-image: linear-gradient(to bottom, #010100, #593313, #A8692B, #C85C07, #D6841D, #E3A449 );
+  
   width: 80vw;
   height: 650px;
 }
@@ -44,42 +44,68 @@ header{
 .menu {
   display: flex;
   flex-flow: wrap nowrap;
-  justify-content: space-between;
+  justify-content: space-betwee;
   
   width: 100%;
 }
 
 .logo {
-  border:1px solid red;
-  height: 300px;
-  : 200px;
+  width: 200px;
+  
+  padding: 70px 10px 10px 10px;
+  
   border-radius: 0px 0px 50% 50%;
+  background-image: linear-gradient(to left bottom , #EC4E20, #E65100, #FF851B, #FF9E00, #FFC300);
+}
+
+.espac {
+  
+  width: 200px;
+  height: 100px;
   background-color: white;
+  
 }
 
 .logo img{
   width: 200px;
   display: flex;
+  
+  
 }
 
 nav {
-  background-color: white;
-  height: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: linear-gradient(to right, #EC4E20, #E65100, #FF851B, #FF9E00, #FFC300);
   height: 100px;
+  width: 100%;
+  padding-right: 100px;
 }
 
 nav ul{
   display: flex;
+  justify-content: flex-end;
   list-style-type: none;
-  border:1px solid red;
+  
+  
 }
 
 nav ul li {
-  padding: 0px 20px;
+  font-size: 25px;
+  padding: 20px 20px;
+  
+  border-left: 2px solid black;
+  
 }
 
 nav ul li a {
   text-decoration: none;
+  color: black;
+}
+
+.abahome {
+  border: none;
 }
 
 main{
