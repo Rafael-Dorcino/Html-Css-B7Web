@@ -17,7 +17,8 @@
 }
 
 body {
-  background-color: #ffdb7e;
+  background-color: #EC4E20;
+
   font-family: "Quicksand", sans-serif;
   font-size: 20px;
   font-optical-sizing: auto;
@@ -36,6 +37,11 @@ body {
 
 header{
   background-image: linear-gradient(to bottom, #010100, #593313, #A8692B, #C85C07, #D6841D, #E3A449 );
+
+  background-image: url(imagens/banner.png);
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: cover;
   
   width: 80vw;
   height: 650px;
@@ -125,7 +131,7 @@ main{
   height: 219px;
 }
 
-section {
+section.itens {
   display: flex;
   
   justify-content: space-around;
@@ -134,7 +140,7 @@ section {
   margin-top: 110px;
 }
 
-article {
+article.melprodutos {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -166,7 +172,7 @@ article {
   
 }
 
-article:hover {
+article.melproduts:hover {
   background-image: linear-gradient(to bottom right,#FFC300 ,  #FF9E00, #FF851B, #E65100, #EC4E20);
   
 }
@@ -203,8 +209,91 @@ section div.produtos h3.preco {
   border-radius: 20px 0px;
 }
 
-footer {
+.sobrenos {
+  background-image: linear-gradient(to top right, #EC4E20, #E65100, #FF851B, #FF9E00, #FFC300, #FF9E00, #FF851B, #E65100, #EC4E20);
+
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+}
+
+.processo {
+  margin-top: 30px;
+}
+
+.producao {
+
+  width: 400px;
+}
+
+.textohist{
+  width: 80%;
+}
+.sobrenos p {
+  margin: 20px;
+  text-align: justify;
+  
+}
+
+.contato {
+  background-image: url(imagens/colher-com-mel.webp);
+  background-repeat: no-repeat;
+  background-position: center center;
+
+   background-image: url(imagens/colher-com-mel.webp), linear-gradient(to top left, #EC4E20, #E65100, #FF851B, #FF9E00, #FFC300, #FF9E00, #FF851B, #E65100, #EC4E20);
+
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  height: 400px;
+}
+
+.contato h2 {
+  padding: 10px 0px;
+  font-weight: bolder;
+  
+}
+
+form {
+  border: 1px solid black;
+  padding: 15px;
+}
+
+input {
+  margin: 10px 0px;
+  padding: 5px;
+  height: 30px;
+  font-size: 20px;
+  border-radius: 10px;
+  border:2px solid white;
+  transform: none;
+  background-color: #e3a34996;
+}
+
+#email {
+  width: 500px;
+}
+
+footer.dadosmel {
   width: 100%;
   height: 300px;
-  background-color: rgb(0, 0, 0);
+  background-color: rgb(255, 255, 255);
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-around;
+  padding-top: 30px;
+  color: white;
+  background-color: black;
 }
+
+footer.desenvolvedor {
+  height: 30px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
