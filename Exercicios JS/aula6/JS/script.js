@@ -50,4 +50,64 @@ function minhaFuncao() {
 }
 
 minhaFuncao();
-console.log(local); // Erro: 'local' não está definida fora da função
+//console.log(local); // Erro: 'local' não está definida fora da função
+
+
+
+
+/*
+Trabalhar com funções dentro de funções (também conhecidas como funções aninhadas ou nested functions) é um dos pilares mais poderosos do JavaScript. Isso abre portas para conceitos como Escopo, Closures e Encapsulamento.
+
+Uma função interna é visível apenas dentro da função que a contém. Ela pode acessar as variáveis da função "pai", mas o contrário não é verdade.
+
+Por que usar funções aninhadas?
+Organização: Se uma lógica só faz sentido dentro de uma função específica, não há motivo para deixá-la "solta" no código global.
+
+Encapsulamento (Privacidade): Você esconde detalhes de implementação. Quem chama a função principal não tem acesso direto às funções internas.
+
+Closures (Fechamentos): Este é o "superpoder". Uma função interna lembra do ambiente onde foi criada, mesmo depois que a função pai já terminou de executar.
+
+O conceito de Closure
+Quando a função pai retorna a função interna, a interna leva consigo uma "mochila" com as variáveis do pai.
+*/
+
+function criarContador() {
+    let contador = 0; // Variável privada
+
+    return function() {
+        contador++;
+        return contador;
+    };
+}
+
+const meuContador = criarContador();
+console.log(meuContador()); // 1
+console.log(meuContador()); // 2
+/*
+No exemplo acima, não há como alterar a variável contador diretamente de fora. Ela está protegida pela função.
+
+Escopo: Quem vê o quê?
+O JavaScript utiliza o Lexical Scoping (Escopo Léxico). Isso significa que a resolução de variáveis segue uma hierarquia:
+
+Escopo Local: Variáveis dentro da própria função interna.
+
+Escopo Externo: Variáveis da função que a envolve.
+
+Escopo Global: Variáveis definidas fora de tudo.
+
+
+*/
+
+function addSquares(a, b) {
+    /* function square(x) {
+        return x * x;
+    } */
+
+    const square = (x) => x * x
+
+    let sqrA = square(a);
+    let sqrB = square(b);
+    return sqrA + sqrB
+}
+
+console.log(addSquares(2, 4))
