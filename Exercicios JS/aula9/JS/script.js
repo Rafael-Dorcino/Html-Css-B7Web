@@ -109,6 +109,7 @@ console.log(`O valor total gasto na compra do computador foi de R$:${val.toFixed
 
 let numero = 0
 
-while(numero < 10){
+while(numero <= 10){
     console.log(`O número da vez é ${numero}`)
+    numero++
 }
