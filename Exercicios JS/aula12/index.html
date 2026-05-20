@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt=br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manipulando elementos</title>
+    <style>
+        body {
+            background-color: lightgray;
+        }
+    </style>
+</head>
+<body>
+    <h1>Manipulando elementos</h1>
+    <div id="listapecas">
+        <h3>Peças Do Computador</h3>
+
+        <p>Configuração do meu computador</p>
+
+        <ul id="pecas">
+            <li>Processador ryzen 5 5500</li>
+            <li>Placa mãe Tuf Gaming B550M</li>
+            <li>Fonte Cordair CX750</li>
+            <li>Monitor LG Ultragear 24P 180hz</li>
+            <li id="placavideo">Placa de video redeon RX5500XT 8gb</li>
+        </ul>
+    </div>
+    <button onclick="info()">Clique para ter informações!</button>
+    <br>
+    <button onclick="trocar()">Tracar placa de video</button>
+
+    <script src="JS/script.js"></script>
+</body>
+</html>
