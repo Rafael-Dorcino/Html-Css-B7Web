@@ -49,20 +49,20 @@ after()Insere o elemento imediatamente após um nó de destino de referência.
 Exemplo prático completo
 Este bloco de código demonstra como construir e inserir um botão clicável funcional em uma página:
 */
-// 1. Create a button element
+// 1. Crie um elemento de botão
 const actionBtn = document.createElement('button');
 
-// 2. Configure the button
+// 2. Configurar o botão
 actionBtn.textContent = 'Click Me!';
 actionBtn.id = 'submit-action';
 actionBtn.className = 'btn btn-success';
 
-// 3. Attach an interactive event listener
+// 3. Anexe um ouvinte de eventos interativo
 actionBtn.addEventListener('click', () => {
   alert('Button clicked successfully!');
 });
 
-// 4. Render it directly onto the webpage's body
+// 4. Renderize-o diretamente no corpo da página web.
 document.body.appendChild(actionBtn);
 
 /*
@@ -106,8 +106,14 @@ function trocar() {
     const upgradepv = document.querySelector('#pecas')
     
     upgradepv.children[4].innerHTML = "<li>Placa de Vídeo <strong>Asus TUF-RTX 5070 TI 16G </strong></li>"
-    upgradepv.children[4].append("Alterado")
-    console.log(pecas.outerHTML)
+    upgradepv.children[4].append("(Alterado)")
 
-    
+    console.log(pecas.outerHTML)
+}
+
+function cpuup(){
+    const cpunova = document.getElementById('ryzen7')
+    cpunova.innerHTML.appendChild = ('Processador Ryzen 7 5700X (Melhorado!)')
+
+    console.log(cpunova)
 }
