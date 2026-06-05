@@ -97,7 +97,7 @@ function info(){
     let newli = document.createElement("li")
     newli.innerHTML = "Cooler Deepcool Ak400"
 
-    ul.appendChild(newli)
+    ul.prepend(newli)
 
     //ul.innerHTML += "<li>Cooler Deepcool Ak400</li>"
 }
@@ -105,7 +105,7 @@ function info(){
 function trocar() {
     const upgradepv = document.querySelector('#pecas')
     
-    upgradepv.children[4].innerHTML = "<li>Placa de Vídeo <strong>Asus TUF-RTX 5070 TI 16G </strong></li>"
+    upgradepv.children[4].innerHTML = "Placa de Vídeo <strong>Asus TUF-RTX 5070 TI 16G </strong>"
     upgradepv.children[4].append("(Alterado)")
 
     console.log(pecas.outerHTML)
@@ -113,7 +113,35 @@ function trocar() {
 
 function cpuup(){
     const cpunova = document.getElementById('ryzen7')
-    cpunova.innerHTML.appendChild = ('Processador Ryzen 7 5700X (Melhorado!)')
+    cpunova.innerText = "Processador Ryzen 7 5700X (Melhorado!)"
 
     console.log(cpunova)
+}
+
+
+
+
+let pente = 1
+
+function mRam(){
+    const upram = document.getElementById('melhorRam')
+    upram.innerText = 'Colocar mais um pente de memoria!'
+    
+    const memoriRam = listapecas.querySelector('ul')
+    let newpecas = document.createElement('li')
+
+    if(pente <= 4){
+        
+        
+        newpecas.innerText = `Memoria RAM DDR4, ${pente} pente`
+        pente ++
+        memoriRam.append(newpecas)
+    } else {
+        alert('A placa mãe suporta só 4 pentes!')
+    }
+    
+
+    
+
+    console.log(newpecas)
 }
