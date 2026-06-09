@@ -122,24 +122,19 @@ function cpuup(){
 
 
 let pente = 1
-let jaexecutou = false
 
 function mRam(){
 
-    const memoriRam = listapecas.querySelector('ul')
-    if(!jaexecutou) {
-        
-        let newpecas = document.createElement('li')
-        
-
-        jaexecutou = true
-    }newpecas.id = 'rampentes'
+    const memoriRam = listapecas.querySelector('ul')  
+    let newpecas = document.createElement('li')
+    
+    newpecas.id = 'rampentes'
 
     const upram = document.getElementById('melhorRam')
     upram.innerText = 'Colocar mais um pente de memoria!'
-
+    
     if(pente <= 4){
-        newpecas.innerText = `Memoria RAM DDR4, ${pente} pente`
+        newpecas.innerHTML = `Memoria RAM DDR4, ${pente} pente`
         pente ++
         memoriRam.append(newpecas)
     } else {
