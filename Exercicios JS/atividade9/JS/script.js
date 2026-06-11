@@ -1,0 +1,2 @@
+//Em JavaScript, como você pode capturar o evento de pressionar a tecla 'Enter' em um campo de input?
+// Utilizando 'input.addEventListener('keydown', function(event) { if (event.key === 'Enter') { ... } })'

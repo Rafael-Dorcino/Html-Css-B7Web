@@ -51,6 +51,20 @@ function acao() {
 }
 
 /*
+Aelement.classList propriedade em JavaScript é uma propriedade somente leitura que retorna uma coleção dinâmica ( DOMTokenList) dos atributos de classe CSS de um elemento HTML. Ela fornece uma maneira limpa e moderna de adicionar, remover ou alternar classes CSS dinamicamente, sem lidar com as manipulações de strings antigas e propensas a erros exigidas por element.className.
+
+Métodos Essenciais
+A página Element.classList da documentação da MDN Web destaca os principais métodos disponíveis para modificar ou verificar as classes dos seus elementos:
+
+-> add(className1, className2, ...)— Adiciona uma ou mais classes especificadas ao elemento. Se uma classe já existir, ela será automaticamente ignorada.
+
+-> remove(className1, className2, ...)— Remove uma ou mais classes especificadas do elemento. Se uma classe não existir, ela será ignorada com segurança, sem gerar erros.
+
+-> toggle(className, forceBoolean)— Ativa ou desativa uma classe. Se a classe existir, ela será removida; se não existir, será adicionada. O segundo parâmetro opcional força a adição ( true) ou a remoção ( false).
+
+-> contains(className)— Retorna um valor booleano (true trueou false false) indicando se o elemento possui a classe especificada.
+
+-> replace(oldClass, newClass)— Substitui uma classe existente por uma classe completamente nova.
 
 */
 
@@ -89,8 +103,16 @@ function segurou(){
     console.log('Segurou!')
 }
 
-function soltou(){
-    console.log('Soltou!')
+function soltou(e){
+    console.log('TECLA APERTADA: '+e.code)
+    console.log('SHIFT? ' + e.shiftKey)
+    console.log('--')
+    //console.log(e.key)
+    //console.log(e.code)
+    //console.log('Soltou!')
 }
 
-document.addEventListener('keyup', soltou)
+const interacao = document.getElementById('eventos')
+
+//console.log(interacao)
+interacao.addEventListener('keyup', soltou)
