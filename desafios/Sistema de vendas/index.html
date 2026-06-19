@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    import { useState, useMemo, useRef } from "react";
+
+// ─── CANAIS DE VENDA ────────────────────────────────────────────────────────
+const CANAIS = {
+  fisico:    { label: "Físico / Loja",    icon: "🏪", taxaPct: 0,    taxaFixa: 4,  cor: "#34D399" },
+  shopping:  { label: "Shopping",         icon: "🏬", taxaPct: 0.20, taxaFixa: 4,  cor: "#60A5FA" },
+  mercadolivre:{ label: "Mercado Livre",  icon: "🛒", taxaPct: 0.20, taxaFixa: 4,  cor: "#F5C842" },
+  amazon:    { label: "Amazon",           icon: "📦", taxaPct: 0.20, taxaFixa: 4,  cor: "#FB923C" },
+  instagram: { label: "Instagram",        icon: "📸", taxaPct: 0.20, taxaFixa: 4,  cor: "#A78BFA" },
+  whatsapp:  { label: "WhatsApp",         icon: "💬", taxaPct: 0,    taxaFixa: 4,  cor: "#34D399" },
+  site:      { label: "Site / Loja Online",icon: "🌐", taxaPct: 0.20, taxaFixa: 4,  cor: "#60A5FA" },
+};
+
+// ─── FORMAS DE PAGAMENTO ────────────────────────────────────────────────────
+const FORMAS_PAG = ["PIX","Cartão Crédito","Cartão Débito","Dinheiro","Boleto","Crédito Parcelado"];
+
+// ─── CÁLCULO FINANCEIRO ─────────────────────────────────────────────────────
+const calcFinanceiro = (custo, venda, canalId = "fisico") => {
+  custo = +custo; venda = +venda;
+  if (!custo || !venda || custo <= 0 || venda <= 0) return null;
+  const canal = CANAIS[canalId] || CANAIS.fisico;
+  const taxaCanal  = venda * canal.taxaPct + canal.taxaFixa;
+  const impostos   = venda * 0.0925;
+  const frete      = custo * 0.02;
+  const lucroB     = venda - custo;
+  const lucroL     = lucroB - taxaCanal - impostos - frete;
+  const margem     = (lucroL / venda) * 100;
+  const margemB    = (lucroB / venda) * 100;
+  const markup     = ((venda - custo) / custo) * 100;
+  const roi        = (lucroL / custo) * 100;
+  return { lucroB, lucroL, margem, margemB, markup, roi, taxaCanal, impostos, frete };
+};
+
+// ─── UTILS ──────────────────────────────────────────────────────────────────
+const fmt  = v => v?.toLocaleString("pt-BR",{style:"currency",currency:"BRL"}) ?? "—";
+const fmtP = v => v != null ? ${v.toFixed(1)}% : "—";
+const hoje = () => new Date().toISOString().slice(0,10);
+const agora= () => new Date().toTimeString().slice(0,5);
+const mesAtual = () => { const d=new Date(); return ${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}; };
+
+// ─── DESIGN TOKENS ──────────────────────────────────────────────────────────
+const C = {
+  bg:"#07090F", surface:"#0D0F18", card:"#131620", border:"#1C1F30",
+  gold:"#F5C842", green:"#34D399", red:"#F87171", blue:"#60A5FA",
+  purple:"#A78BFA", orange:"#FB923C", text:"#E8EAF0", muted:"#6B7280", dim:"#252840",
+};
+
+// ─── COMPONENTES BASE ────────────────────────────────────────────────────────
+const Badge = ({color,children,sm}) => {
+  const m={green:[C.green,"rgba(52,211,153,0.12)"],red:[C.red,"rgba(248,113,113,0.12)"],
+    gold:[C.gold,"rgba(245,200,66,0.12)"],blue:[C.blue,"rgba(96,165,250,0.12)"],
+    purple:[C.purple,"rgba(167,139,250,0.12)"],orange:[C.orange,"rgba(251,146,60,0.12)"]};
+  const [clr,bg]=m[color]??[C.muted,"rgba(255,255,255,0.07)"];
+  return <span style={{background:bg,color:clr,padding:sm?"2px 8px":"3px 10px",borderRadius:99,fontSize:sm?10:11,fontWeight:700,display:"inline-block"}}>{children}</span>;
+};
+
+const Inp = ({label,style:st,...p}) => (
+  <div style={{display:"flex",flexDirection:"column",gap:5,flex:1,minWidth:0,...st}}>
+    {label&&<label style={{fontSize:10,color:C.muted,fontWeight:700,letterSpacing:.6,textTransform:"uppercase"}}>{label}</label>}
+    <input style={{background:C.bg,border:1px solid ${C.border},borderRadius:12,color:C.text,padding:"12px 14px",fontSize:15,outline:"none",width:"100%",boxSizing:"border-box",WebkitAppearance:"none",appearance:"none",fontFamily:"inherit"}}
+      onFocus={e=>e.target.style.border=1px solid ${C.gold}}
+      onBlur={e=>e.target.style.border=1px solid ${C.border}} {...p}/>
+  </div>
+);
+
+const Sel = ({label,children,...p}) => (
+  <div style={{display:"flex",flexDirection:"column",gap:5,flex:1,minWidth:0}}>
+    {label&&<label style={{fontSize:10,color:C.muted,fontWeight:700,letterSpacing:.6,textTransform:"uppercase"}}>{label}</label>}
+    <select style={{background:C.bg,border:1px solid ${C.border},borderRadius:12,color:C.text,padding:"12px 14px",fontSize:15,outline:"none",width:"100%",WebkitAppearance:"none",appearance:"none",fontFamily:"inherit"}} {...p}>{children}</select>
+  </div>
+);
+
+const Btn = ({variant="primary",full,sm,children,style:st,...p}) => {
+  const s={
+    primary:{background:C.gold,color:"#07090F",border:"none"},
+    outline:{background:"transparent",color:C.gold,border:1px solid ${C.gold}},
+    danger:{background:"rgba(248,113,113,0.08)",color:C.red,border:1px solid rgba(248,113,113,0.25)},
+    ghost:{background:"rgba(255,255,255,0.04)",color:C.muted,border:"none"},
+    green:{background:"rgba(52,211,153,0.1)",color:C.green,border:1px solid rgba(52,211,153,0.3)},
+  };
+  return <button style={{...s[variant],borderRadius:12,padding:sm?"8px 14px":"13px 20px",fontSize:sm?12:14,fontWeight:800,cursor:"pointer",width:full?"100%":undefined,fontFamily:"inherit",...st}} {...p}>{children}</button>;
+};
+
+const HR = () => <div style={{height:1,background:C.border,margin:"8px 0"}}/>;
+
+const Section = ({title,right,children,style:st}) => (
+  <div style={{background:C.card,borderRadius:18,border:1px solid ${C.border},overflow:"hidden",marginBottom:12,...st}}>
+    {title&&<div style={{padding:"13px 16px",borderBottom:1px solid ${C.border},display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+      <span style={{fontWeight:800,fontSize:13,color:C.text}}>{title}</span>
+      {right}
+    </div>}
+    {children}
+  </div>
+);
+
+// ─── MINI GRÁFICO BARRAS ─────────────────────────────────────────────────────
+const BarChart = ({data,color=C.gold,height=60}) => {
+  if(!data.length||data.every(d=>d.v===0)) return <div style={{color:C.dim,fontSize:12,textAlign:"center",padding:"20px 0"}}>Sem dados suficientes</div>;
+  const max=Math.max(...data.map(d=>d.v),1);
+  return (
+    <div style={{display:"flex",gap:4,alignItems:"flex-end",height}}>
+      {data.map((d,i)=>(
+        <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
+          <div style={{width:"100%",minHeight:d.v>0?4:0,height:Math.max((d.v/max)*(height-16),d.v>0?4:0),background:d.v===max?color:${color}44,borderRadius:"4px 4px 0 0",transition:"height .3s"}}/>
+          <span style={{fontSize:8,color:C.muted,fontWeight:600,whiteSpace:"nowrap"}}>{d.l}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// ─── SELECTOR DE CANAL ───────────────────────────────────────────────────────
+const CanalSelector = ({value,onChange}) => (
+  <div>
+    <label style={{fontSize:10,color:C.muted,fontWeight:700,letterSpacing:.6,textTransform:"uppercase",display:"block",marginBottom:8}}>Canal de Venda *</label>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+      {Object.entries(CANAIS).map(([id,c])=>{
+        const sel=value===id;
+        return (
+          <button key={id} onClick={()=>onChange(id)}
+            style={{background:sel?${c.cor}18:C.bg,border:1.5px solid ${sel?c.cor:C.border},borderRadius:12,padding:"10px 10px",cursor:"pointer",display:"flex",alignItems:"center",gap:8,textAlign:"left",fontFamily:"inherit"}}>
+            <span style={{fontSize:18}}>{c.icon}</span>
+            <div>
+              <div style={{fontSize:12,fontWeight:sel?800:600,color:sel?c.cor:C.muted,lineHeight:1.2}}>{c.label}</div>
+              <div style={{fontSize:9,color:C.dim,marginTop:1}}>
+                {c.taxaPct>0?${(c.taxaPct*100).toFixed(0)}% + R$${c.taxaFixa}:R$${c.taxaFixa} taxa}
+              </div>
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
+
+// ─── PAINEL FINANCEIRO ───────────────────────────────────────────────────────
+const FinPanel = ({custo,venda,canalId}) => {
+  const r = calcFinanceiro(custo,venda,canalId);
+  const canal = CANAIS[canalId]||CANAIS.fisico;
+  if(!r) return <div style={{background:C.bg,borderRadius:14,padding:16,border:1px solid ${C.border},textAlign:"center",color:C.dim,fontSize:13}}>Informe custo e venda para ver a análise</div>;
+  return (
+    <div style={{background:C.bg,borderRadius:14,padding:14,border:1px solid ${C.border}}}>
+      <div style={{fontSize:10,color:C.muted,fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:12}}>
+        📊 Análise — {canal.icon} {canal.label}
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+        {[
+          {l:"Lucro Bruto",    v:fmt(r.lucroB),   c:r.lucroB>0?C.green:C.red, d:"Venda − Custo"},
+          {l:"Taxa do Canal",  v:fmt(r.taxaCanal), c:C.orange, d:${(canal.taxaPct*100).toFixed(0)}% + R$${canal.taxaFixa} fixo},
+          {l:"Impostos",       v:fmt(r.impostos),  c:C.gold,   d:"~9,25% Simples Nacional"},
+          {l:"Frete/Logíst.",  v:fmt(r.frete),     c:C.gold,   d:"~2% do custo"},
+          {l:"Lucro Líquido",  v:fmt(r.lucroL),    c:r.lucroL>0?C.green:C.red, d:"Real após todas deduções", bold:true},
+          {l:"Margem Líquida", v:fmtP(r.margem),   c:C.blue,   d:"Lucro liq. / Venda"},
+          {l:"Markup",         v:fmtP(r.markup),   c:C.purple, d:"Lucro bruto / Custo"},
+          {l:"ROI",            v:fmtP(r.roi),      c:r.roi>0?C.green:C.red, d:"Retorno s/ investimento"},
+        ].map(i=>(
+          <div key={i.l} style={{background:C.card,borderRadius:10,padding:"10px 12px",borderLeft:3px solid ${i.c},gridColumn:i.bold?"1/-1":undefined}}>
+            <div style={{fontSize:9,color:C.muted}}>{i.l}</div>
+            <div style={{fontSize:i.bold?18:14,fontWeight:900,color:i.c}}>{i.v}</div>
+            <div style={{fontSize:9,color:C.dim}}>{i.d}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ─── UPLOAD DE FOTOS ─────────────────────────────────────────────────────────
+const FotoUpload = ({fotos=[],onChange}) => {
+  const ref=useRef();
+  const handle=e=>{
+    Array.from(e.target.files).slice(0,2-fotos.length).forEach(f=>{
+      const r=new FileReader();
+      r.onload=ev=>onChange([...fotos,ev.target.result].slice(0,2));
+      r.readAsDataURL(f);
+    });
+    e.target.value="";
+  };
+  return (
+    <div>
+      <label style={{fontSize:10,color:C.muted,fontWeight:700,letterSpacing:.6,textTransform:"uppercase",display:"block",marginBottom:8}}>Fotos do Produto (máx. 2)</label>
+      <div style={{display:"flex",gap:10}}>
+        {fotos.map((f,i)=>(
+          <div key={i} style={{position:"relative",width:88,height:88,borderRadius:14,overflow:"hidden",border:1px solid ${C.border},flexShrink:0}}>
+            <img src={f} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+            <button onClick={()=>onChange(fotos.filter((_,x)=>x!==i))}
+              style={{position:"absolute",top:4,right:4,width:22,height:22,borderRadius:99,background:"rgba(0,0,0,0.75)",border:"none",color:"#fff",fontSize:11,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+          </div>
+        ))}
+        {fotos.length<2&&(
+          <button onClick={()=>ref.current.click()}
+            style={{width:88,height:88,borderRadius:14,border:2px dashed ${C.border},background:C.bg,color:C.muted,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,flexShrink:0}}>
+            <span style={{fontSize:22}}>📷</span>
+            <span style={{fontSize:9,fontWeight:700,letterSpacing:.5}}>FOTO</span>
+          </button>
+        )}
+        <input ref={ref} type="file" accept="image/*" multiple style={{display:"none"}} onChange={handle}/>
+      </div>
+    </div>
+  );
+};
+
+// ─── COMPROVANTE ─────────────────────────────────────────────────────────────
+const Comprovante = ({venda,produto,onFechar}) => {
+  const canal = CANAIS[venda.canal]||CANAIS.fisico;
+  const r = calcFinanceiro(produto.custo, produto.venda, venda.canal);
+  const total = produto.venda * venda.qtd;
+  return (
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.92)",zIndex:3000,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
+      <div style={{background:C.card,borderRadius:"24px 24px 0 0",width:"100%",maxWidth:480,maxHeight:"93vh",overflowY:"auto",padding:"12px 20px 48px",border:1px solid ${C.border}}}>
+        <div style={{width:40,height:4,background:C.dim,borderRadius:2,margin:"8px auto 20px"}}/>
+        {produto.fotos?.[0]&&<div style={{display:"flex",justifyContent:"center",marginBottom:16}}><img src={produto.fotos[0]} alt="" style={{width:80,height:80,borderRadius:16,objectFit:"cover",border:1px solid ${C.border}}}/></div>}
+        <div style={{textAlign:"center",marginBottom:22}}>
+          <div style={{width:52,height:52,background:"rgba(52,211,153,0.15)",borderRadius:999,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 10px",fontSize:26}}>✅</div>
+          <div style={{fontWeight:900,fontSize:20,color:C.green}}>Venda Confirmada!</div>
+          <div style={{fontSize:12,color:C.muted,marginTop:4}}>#{String(venda.id).slice(-6)} · {venda.data} {venda.hora&&às ${venda.hora}}</div>
+          <div style={{marginTop:8}}><Badge color="blue">{canal.icon} {canal.label}</Badge></div>
+        </div>
+        <div style={{background:C.bg,borderRadius:16,padding:18,marginBottom:14}}>
+          <div style={{fontWeight:800,fontSize:15,marginBottom:2}}>{produto.nome}</div>
+          <div style={{fontSize:12,color:C.muted,marginBottom:14}}>{produto.modelo}{produto.cor?` · ${produto.cor}`:""}</div>
+          <HR/>
+          <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:9}}>
+            {[{l:"Cliente",v:venda.cliente||"—"},{l:"Pagamento",v:venda.formaPag},{l:"Quantidade",v:${venda.qtd} un.},{l:"Preço Unitário",v:fmt(produto.venda)}].map(i=>(
+              <div key={i.l} style={{display:"flex",justifyContent:"space-between"}}>
+                <span style={{fontSize:13,color:C.muted}}>{i.l}</span>
+                <span style={{fontSize:13,fontWeight:700}}>{i.v}</span>
+              </div>
+            ))}
+            <HR/>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <span style={{fontSize:15,fontWeight:900}}>Total Recebido</span>
+              <span style={{fontSize:20,fontWeight:900,color:C.gold}}>{fmt(total)}</span>
+            </div>
+          </div>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:12}}>
+          {[
+            {l:"Taxa Canal",   v:fmt(r?r.taxaCanal*venda.qtd:0), c:C.orange},
+            {l:"Impostos",     v:fmt(r?r.impostos*venda.qtd:0),  c:C.gold},
+            {l:"Lucro Bruto",  v:fmt(r?r.lucroB*venda.qtd:0),    c:C.green},
+            {l:"Lucro Líquido",v:fmt(r?r.lucroL*venda.qtd:0),    c:r?.lucroL>0?C.green:C.red},
+          ].map(i=>(
+            <div key={i.l} style={{background:C.bg,borderRadius:12,padding:"10px 10px",textAlign:"center"}}>
+              <div style={{fontSize:9,color:C.muted,marginBottom:3}}>{i.l}</div>
+              <div style={{fontSize:13,fontWeight:900,color:i.c}}>{i.v}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{background:C.bg,borderRadius:14,padding:14,marginBottom:16}}>
+          {[
+            {l:"Margem Líquida",v:fmtP(r?.margem),  c:C.blue},
+            {l:"Markup",        v:fmtP(r?.markup),   c:C.purple},
+            {l:"ROI",           v:fmtP(r?.roi),      c:r?.roi>0?C.green:C.red},
+          ].map(i=>(
+            <div key={i.l} style={{display:"flex",justifyContent:"space-between",padding:"7px 0",borderBottom:1px solid ${C.border}}}>
+              <span style={{fontSize:13,color:C.muted}}>{i.l}</span>
+              <span style={{fontSize:14,fontWeight:900,color:i.c}}>{i.v}</span>
+            </div>
+          ))}
+        </div>
+        <Btn full variant="ghost" style={{background:C.surface}} onClick={onFechar}>Fechar Comprovante</Btn>
+      </div>
+    </div>
+  );
+};
+
+// ─── ESTADOS INICIAIS ────────────────────────────────────────────────────────
+const PROD0 = {nome:"",modelo:"",cor:"",fornecedorId:"",custo:"",venda:"",estoque:"",minEstoque:"",mediaVendasMes:"",fotos:[],canaisAtivos:["fisico"]};
+const FORN0 = {nome:"",contato:"",cidade:"",email:""};
+const VENDA0 = {produtoId:"",qtd:"1",cliente:"",formaPag:"PIX",canal:"fisico",data:hoje(),hora:agora()};
+
+// ════════════════════════════════════════════════════════════════════════════
+//  APP PRINCIPAL
+// ════════════════════════════════════════════════════════════════════════════
+export default function App() {
+  const [aba,setAba]           = useState("dashboard");
+  const [subAba,setSubAba]     = useState("resumo"); // dashboard sub-abas
+  const [produtos,setProdutos] = useState([]);
+  const [fornecedores,setFornecedores] = useState([]);
+  const [vendas,setVendas]     = useState([]);
+
+  const [modalProd,setModalProd]   = useState(null);
+  const [modalForn,setModalForn]   = useState(null);
+  const [modalVenda,setModalVenda] = useState(false);
+  const [comprovante,setComprovante] = useState(null);
+  const [detalheVenda,setDetalheVenda] = useState(null);
+  const [lightbox,setLightbox]     = useState(null);
+
+  const [fp,setFp] = useState(PROD0);
+  const [ff,setFf] = useState(FORN0);
+  const [fv,setFv] = useState(VENDA0);
+  const [busca,setBusca] = useState("");
+  const [toast,setToast] = useState(null);
+
+  const showToast=(msg,type="ok")=>{setToast({msg,type});setTimeout(()=>setToast(null),3200);};
+
+  // ── KPIs Gerais ────────────────────────────────────────────────────────
+  const kpis = useMemo(()=>{
+    const fat=vendas.reduce((a,v)=>{const p=produtos.find(x=>x.id===v.produtoId);return a+(p?p.venda*v.qtd:0);},0);
+    const custoTotal=vendas.reduce((a,v)=>{const p=produtos.find(x=>x.id===v.produtoId);return a+(p?p.custo*v.qtd:0);},0);
+    const lucroL=vendas.reduce((a,v)=>{const p=produtos.find(x=>x.id===v.produtoId);if(!p)return a;const r=calcFinanceiro(p.custo,p.venda,v.canal);return a+(r?r.lucroL*v.qtd:0);},0);
+    const lucroB=fat-custoTotal;
+    const estVal=produtos.reduce((a,p)=>a+p.estoque*p.custo,0);
+    const alertas=produtos.filter(p=>p.estoque<=p.minEstoque&&p.minEstoque>0).length;
+    return {fat,lucroB,lucroL,estVal,alertas,total:vendas.length};
+  },[produtos,vendas]);
+
+  // ── KPIs Mês ──────────────────────────────────────────────────────────
+  const mes = mesAtual();
+  const vendasMes = useMemo(()=>vendas.filter(v=>v.data?.startsWith(mes)),[vendas,mes]);
+  const kpisMes = useMemo(()=>{
+    const fat=vendasMes.reduce((a,v)=>{const p=produtos.find(x=>x.id===v.produtoId);return a+(p?p.venda*v.qtd:0);},0);
+    const lucroL=vendasMes.reduce((a,v)=>{const p=produtos.find(x=>x.id===v.produtoId);if(!p)return a;const r=calcFinanceiro(p.custo,p.venda,v.canal);return a+(r?r.lucroL*v.qtd:0);},0);
+    return {fat,lucroL,qtd:vendasMes.length};
+  },[vendasMes,produtos]);
+
+  // ── Mais vendidos do mês ─────────────────────────────────────────────
+  const maisVendidosMes = useMemo(()=>{
+    const m={};
+    vendasMes.forEach(v=>{
+      const p=produtos.find(x=>x.id===v.produtoId);
+      if(!p)return;
+      if(!m[p.id])m[p.id]={...p,qtd:0,fat:0,lucroL:0};
+      const r=calcFinanceiro(p.custo,p.venda,v.canal);
+      m[p.id].qtd+=v.qtd;
+      m[p.id].fat+=v.qtd*p.venda;
+      m[p.id].lucroL+=r?r.lucroL*v.qtd:0;
+    });
+    return Object.values(m).sort((a,b)=>b.qtd-a.qtd);
+  },[vendasMes,produtos]);
+
+  // ── Vendas por hora ──────────────────────────────────────────────────
+  const vendasPorHora = useMemo(()=>{
+    const faixas=[
+      {l:"6-9h",min:6,max:9},{l:"9-12h",min:9,max:12},{l:"12-14h",min:12,max:14},
+      {l:"14-17h",min:14,max:17},{l:"17-20h",min:17,max:20},{l:"20-24h",min:20,max:24},
+    ];
+    return faixas.map(f=>{
+      const v=vendas.filter(vd=>{if(!vd.hora)return false;const h=parseInt(vd.hora);return h>=f.min&&h<f.max;}).length;
+      return {l:f.l,v};
+    });
+  },[vendas]);
+
+  // ── Vendas por canal ─────────────────────────────────────────────────
+  const vendasPorCanal = useMemo(()=>{
+    const m={};
+    vendas.forEach(v=>{
+      const canal=v.canal||"fisico";
+      if(!m[canal])m[canal]={fat:0,lucroL:0,qtd:0};
+      const p=produtos.find(x=>x.id===v.produtoId);
+      if(!p)return;
+      const r=calcFinanceiro(p.custo,p.venda,canal);
+      m[canal].fat+=p.venda*v.qtd;
+      m[canal].lucroL+=r?r.lucroL*v.qtd:0;
+      m[canal].qtd+=v.qtd;
+    });
+    return Object.entries(m).map(([id,d])=>({id,...d,canal:CANAIS[id]||CANAIS.fisico})).sort((a,b)=>b.fat-a.fat);
+  },[vendas,produtos]);
+
+  // ── Vendas por dia ───────────────────────────────────────────────────
+  const vendasPorDia = useMemo(()=>{
+    const m={};
+    vendasMes.forEach(v=>{const d=v.data?.slice(8,10);if(d)m[d]=(m[d]||0)+v.qtd;});
+    return Object.entries(m).sort().slice(-12).map(([l,v])=>({l:${parseInt(l)},v}));
+  },[vendasMes]);
+
+  // ── Curva ABC ────────────────────────────────────────────────────────
+  const curvaABC = useMemo(()=>{
+    if(!produtos.length)return[];
+    const data=produtos.map(p=>{
+      const fat=vendas.filter(v=>v.produtoId===p.id).reduce((a,v)=>a+v.qtd*p.venda,0);
+      return {...p,fat};
+    }).sort((a,b)=>b.fat-a.fat);
+    const total=data.reduce((a,d)=>a+d.fat,0);
+    let acum=0;
+    return data.map(p=>{acum+=total>0?(p.fat/total)*100:0;return{...p,acum,curva:acum<=80?"A":acum<=95?"B":"C"};});
+  },[produtos,vendas]);
+
+  // ── Previsão ─────────────────────────────────────────────────────────
+  const previsoes = useMemo(()=>produtos.map(p=>{
+    const media=p.mediaVendasMes||0;
+    const dias=media>0?Math.floor((p.estoque/media)*30):null;
+    const ideal=Math.ceil(media*2);
+    return {...p,dias,ideal,repor:Math.max(0,ideal-p.estoque),status:dias===null?"sem":dias<=15?"critico":dias<=30?"atencao":"ok"};
+  }).sort((a,b)=>(a.dias??9999)-(b.dias??9999)),[produtos]);
+
+  // ── CRUD ─────────────────────────────────────────────────────────────
+  const abrirProd=p=>{setFp(p==="novo"?PROD0:{...p,fotos:p.fotos||[],canaisAtivos:p.canaisAtivos||["fisico"]});setModalProd(p);};
+  const salvarProd=()=>{
+    if(!fp.nome||!fp.custo||!fp.venda)return showToast("Nome, custo e venda são obrigatórios!","err");
+    const base={...fp,custo:+fp.custo,venda:+fp.venda,estoque:+fp.estoque||0,minEstoque:+fp.minEstoque||0,fornecedorId:+fp.fornecedorId||null,mediaVendasMes:+fp.mediaVendasMes||0};
+    if(modalProd==="novo")setProdutos(prev=>[...prev,{...base,id:Date.now()}]);
+    else setProdutos(prev=>prev.map(p=>p.id===modalProd.id?{...p,...base}:p));
+    setModalProd(null);showToast(modalProd==="novo"?"Produto cadastrado!":"Produto atualizado!");
+  };
+  const salvarForn=()=>{
+    if(!ff.nome)return showToast("Nome obrigatório!","err");
+    if(modalForn==="novo")setFornecedores(prev=>[...prev,{...ff,id:Date.now()}]);
+    else setFornecedores(prev=>prev.map(f=>f.id===modalForn.id?{...f,...ff}:f));
+    setModalForn(null);showToast("Fornecedor salvo!");
+  };
+  const registrarVenda=()=>{
+    if(!fv.produtoId)return showToast("Selecione um produto!","err");
+    const prod=produtos.find(p=>p.id===+fv.produtoId);
+    if(!prod)return;
+    if(prod.estoque<+fv.qtd)return showToast(Estoque insuficiente! Disponível: ${prod.estoque},"err");
+    const novaVenda={...fv,id:Date.now(),produtoId:+fv.produtoId,qtd:+fv.qtd};
+    setProdutos(prev=>prev.map(p=>p.id===+fv.produtoId?{...p,estoque:p.estoque-+fv.qtd}:p));
+    setVendas(prev=>[...prev,novaVenda]);
+    setModalVenda(false);setFv(VENDA0);
+    setComprovante({venda:novaVenda,produto:prod});
+  };
+
+  // ── Layout helpers ────────────────────────────────────────────────────
+  const overlayStyle={position:"fixed",inset:0,background:"rgba(0,0,0,0.88)",zIndex:1000,display:"flex",alignItems:"flex-end",justifyContent:"center"};
+  const sheetStyle={background:C.card,borderRadius:"22px 22px 0 0",width:"100%",maxWidth:480,maxHeight:"93vh",overflowY:"auto",padding:"12px 20px 48px",border:1px solid ${C.border}};
+  const Handle=()=><div style={{width:40,height:4,background:C.dim,borderRadius:2,margin:"8px auto 22px"}}/>;
+
+  const KPI=({label,value,sub,accent,icon,onClick})=>(
+    <div onClick={onClick} style={{background:C.card,borderRadius:16,padding:"14px 14px",border:1px solid ${C.border},borderTop:3px solid ${accent},flex:1,minWidth:0,cursor:onClick?"pointer":undefined}}>
+      <div style={{fontSize:18,marginBottom:4}}>{icon}</div>
+      <div style={{fontSize:9,color:C.muted,textTransform:"uppercase",letterSpacing:.5,marginBottom:3}}>{label}</div>
+      <div style={{fontSize:15,fontWeight:900,color:C.text,lineHeight:1.1}}>{value}</div>
+      {sub&&<div style={{fontSize:10,color:C.dim,marginTop:4}}>{sub}</div>}
+    </div>
+  );
+
+  const tabs=[
+    {id:"dashboard",icon:"📊",label:"Início"},
+    {id:"produtos", icon:"⌚",label:"Produtos"},
+    {id:"vendas",   icon:"💰",label:"Vendas"},
+    {id:"estoque",  icon:"📦",label:"Estoque"},
+    {id:"fornecedores",icon:"🏭",label:"Fornec."},
+  ];
+
+  const prodFiltrados=produtos.filter(p=>p.nome.toLowerCase().includes(busca.toLowerCase()));
+  const prodVendaSelecionado=fv.produtoId?produtos.find(x=>x.id===+fv.produtoId):null;
+
+  // ════════════════════════════════════════════════════════════════════
+  return (
+    <div style={{background:C.bg,minHeight:"100vh",fontFamily:"'Inter',-apple-system,sans-serif",color:C.text,paddingBottom:82,maxWidth:480,margin:"0 auto",position:"relative"}}>
+
+      {/* ══ DASHBOARD ══════════════════════════════════════════════════ */}
+      {aba==="dashboard"&&(
+        <div style={{padding:"16px 14px 0"}}>
+          {/* Header */}
+          <div style={{paddingTop:16,marginBottom:16,display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+            <div>
+              <div style={{fontSize:22,fontWeight:900,letterSpacing:-.5}}>⌚ WatchOS</div>
+              <div style={{fontSize:12,color:C.muted}}>{new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long"})}</div>
+            </div>
+            <Btn sm onClick={()=>setModalVenda(true)} style={{flexShrink:0}}>+ Venda</Btn>
+          </div>
+
+          {/* Sub-abas do dashboard */}
+          <div style={{display:"flex",gap:6,marginBottom:16,background:C.surface,borderRadius:14,padding:4}}>
+            {[{id:"resumo",l:"Resumo"},{id:"analise",l:"Análise"},{id:"canais",l:"Canais"},{id:"curva",l:"Curva ABC"}].map(s=>(
+              <button key={s.id} onClick={()=>setSubAba(s.id)}
+                style={{flex:1,padding:"8px 4px",borderRadius:10,border:"none",cursor:"pointer",fontSize:11,fontWeight:700,
+                  background:subAba===s.id?C.gold:"transparent",color:subAba===s.id?"#07090F":C.muted,fontFamily:"inherit"}}>
+                {s.l}
+              </button>
+            ))}
+          </div>
+
+          {/* ── RESUMO ── */}
+          {subAba==="resumo"&&(<>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:12}}>
+              <KPI label="Faturamento Total" value={fmt(kpis.fat)} sub={${kpis.total} vendas} accent={C.gold} icon="💰"/>
+              <KPI label="Lucro Líquido Total" value={fmt(kpis.lucroL)} sub="Após taxas e impostos" accent={C.green} icon="✅"/>
+              <KPI label="Lucro Bruto Total" value={fmt(kpis.lucroB)} sub="Antes das deduções" accent={C.blue} icon="📈"/>
+              <KPI label="Valor em Estoque" value={fmt(kpis.estVal)} sub={${produtos.length} produtos} accent={C.purple} icon="📦"/>
+            </div>
+
+            {/* Mês atual */}
+            <Section title={📅 Este Mês — ${new Date().toLocaleDateString("pt-BR",{month:"long"})}}>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,padding:12}}>
+                {[
+                  {l:"Faturado",v:fmt(kpisMes.fat),c:C.gold},
+                  {l:"Lucro Liq.",v:fmt(kpisMes.lucroL),c:C.green},
+                  {l:"Vendas",v:kpisMes.qtd,c:C.blue},
+                ].map(i=>(
+                  <div key={i.l} style={{background:C.bg,borderRadius:12,padding:"10px 10px",textAlign:"center"}}>
+                    <div style={{fontSize:9,color:C.muted,marginBottom:3}}>{i.l}</div>
+                    <div style={{fontSize:14,fontWeight:900,color:i.c}}>{i.v}</div>
+                  </div>
+                ))}
+              </div>
+            </Section>
+
+            {/* Alerta */}
+            {kpis.alertas>0&&(
+              <div style={{background:"rgba(248,113,113,0.07)",border:1px solid rgba(248,113,113,0.25),borderRadius:14,padding:"12px 14px",marginBottom:12,display:"flex",gap:12,alignItems:"center",cursor:"pointer"}} onClick={()=>setAba("estoque")}>
+                <span style={{fontSize:22}}>⚠️</span>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:800,color:C.red,fontSize:13}}>{kpis.alertas} produto{kpis.alertas>1?"s":""} com estoque baixo</div>
+                  <div style={{fontSize:11,color:C.muted}}>Toque para ver detalhes →</div>
+                </div>
+              </div>
+            )}
+
+            {/* Mais vendidos mês */}
+            {maisVendidosMes.length>0&&(
+              <Section title="🏆 Mais Vendidos do Mês" right={<Badge color="gold" sm>{new Date().toLocaleDateString("pt-BR",{month:"short"}).toUpperCase()}</Badge>}>
+                {maisVendidosMes.slice(0,5).map((p,i)=>{
+                  const medals=["🥇","🥈","🥉","4️⃣","5️⃣"];
+                  return (
+                    <div key={p.id} style={{padding:"11px 14px",borderBottom:1px solid ${C.border},display:"flex",gap:10,alignItems:"center"}}>
+                      {p.fotos?.[0]?<img src={p.fotos[0]} alt="" style={{width:38,height:38,borderRadius:10,objectFit:"cover",flexShrink:0}}/>
+                        :<div style={{width:38,height:38,borderRadius:10,background:C.dim,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>{medals[i]}</div>}
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontWeight:700,fontSize:13,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{p.nome}</div>
+                        <div style={{fontSize:10,color:C.muted}}>{p.qtd} un. vendidas · Lucro: {fmt(p.lucroL)}</div>
+                      </div>
+                      <div style={{textAlign:"right",flexShrink:0}}>
+                        <div style={{fontWeight:900,color:C.gold,fontSize:13}}>{fmt(p.fat)}</div>
+                        <Badge color="green" sm>+{fmtP(p.fat>0?(p.lucroL/p.fat)*100:0)}</Badge>
+                      </div>
+                    </div>
+                  );
+                })}
+              </Section>
+            )}
+
+            {/* Últimas vendas */}
+            {vendas.length>0&&(
+              <Section title="🕐 Últimas Vendas">
+                {[...vendas].reverse().slice(0,5).map(v=>{
+                  const p=produtos.find(x=>x.id===v.produtoId);
+                  const r=p?calcFinanceiro(p.custo,p.venda,v.canal):null;
+                  const canal=CANAIS[v.canal]||CANAIS.fisico;
+                  return (
+                    <div key={v.id} style={{padding:"11px 14px",borderBottom:1px solid ${C.border},display:"flex",gap:10,alignItems:"center",cursor:"pointer"}} onClick={()=>p&&setDetalheVenda({venda:v,produto:p})}>
+                      {p?.fotos?.[0]?<img src={p.fotos[0]} alt="" style={{width:38,height:38,borderRadius:10,objectFit:"cover",flexShrink:0}}/>
+                        :<div style={{width:38,height:38,borderRadius:10,background:C.dim,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>⌚</div>}
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontWeight:700,fontSize:13,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{p?.nome??"—"}</div>
+                        <div style={{fontSize:10,color:C.muted}}>{canal.icon} {canal.label} · {v.hora&&`${v.hora} · `}{v.data}</div>
+                      </div>
+                      <div style={{textAlign:"right",flexShrink:0}}>
+                        <div style={{fontWeight:900,color:C.gold,fontSize:13}}>{fmt((p?.venda??0)*v.qtd)}</div>
+                        <div style={{fontSize:10,color:C.green}}>+{fmt(r?r.lucroL*v.qtd:0)}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </Section>
+            )}
+
+            {produtos.length===0&&(
+              <div style={{textAlign:"center",padding:"48px 20px",color:C.muted}}>
+                <div style={{fontSize:52,marginBottom:14}}>⌚</div>
+                <div style={{fontWeight:900,fontSize:18,color:C.text,marginBottom:8}}>Sistema pronto!</div>
+                <div style={{fontSize:13,marginBottom:24,lineHeight:1.7}}>Cadastre produtos e fornecedores para começar a gerenciar suas vendas de smartwatches.</div>
+                <Btn onClick={()=>setAba("produtos")}>Cadastrar Primeiro Produto</Btn>
+              </div>
+            )}
+          </>)}
+
+          {/* ── ANÁLISE ── */}
+          {subAba==="analise"&&(<>
+            {vendas.filter(v=>v.hora).length>0?(
+              <Section title="🕐 Horários que Mais Vendo">
+                <div style={{padding:"14px 14px"}}>
+                  <BarChart data={vendasPorHora} color={C.blue} height={70}/>
+                  {(()=>{const pico=vendasPorHora.reduce((a,b)=>b.v>a.v?b:a,{v:0,l:""});return pico.v>0&&<div style={{marginTop:10,fontSize:12,color:C.blue,fontWeight:700}}>⚡ Pico: <strong>{pico.l}</strong> com {pico.v} venda{pico.v>1?"s":""}</div>;})()}
+                </div>
+              </Section>
+            ):<div style={{background:C.card,borderRadius:16,padding:20,textAlign:"center",color:C.muted,fontSize:13,marginBottom:12}}>Registre vendas com horário para ver o gráfico de picos.</div>}
+
+            {vendasPorDia.length>1&&(
+              <Section title="📈 Vendas por Dia (este mês)">
+                <div style={{padding:"14px 14px"}}><BarChart data={vendasPorDia} color={C.gold} height={70}/></div>
+              </Section>
+            )}
+
+            {/* Ticket médio por canal */}
+            {vendasPorCanal.length>0&&(
+              <Section title="🎯 Desempenho por Canal">
+                {vendasPorCanal.map(c=>(
+                  <div key={c.id} style={{padding:"12px 14px",borderBottom:1px solid ${C.border}}}>
+                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
+                      <div style={{display:"flex",alignItems:"center",gap:8}}>
+                        <span style={{fontSize:20}}>{c.canal.icon}</span>
+                        <div>
+                          <div style={{fontWeight:700,fontSize:13}}>{c.canal.label}</div>
+                          <div style={{fontSize:10,color:C.muted}}>{c.qtd} unidades vendidas</div>
+                        </div>
+                      </div>
+                      <div style={{textAlign:"right"}}>
+                        <div style={{fontWeight:900,color:C.gold,fontSize:13}}>{fmt(c.fat)}</div>
+                        <div style={{fontSize:10,color:C.green}}>+{fmt(c.lucroL)} liq.</div>
+                      </div>
+                    </div>
+                    <div style={{height:4,background:C.border,borderRadius:2}}>
+                      <div style={{height:"100%",width:${Math.min((c.fat/(vendasPorCanal[0]?.fat||1))*100,100)}%,background:c.canal.cor,borderRadius:2}}/>
+                    </div>
+                  </div>
+                ))}
+              </Section>
+            )}
+
+            {vendas.length===0&&<div style={{background:C.card,borderRadius:16,padding:20,textAlign:"center",color:C.muted,fontSize:13}}>Nenhuma venda registrada ainda.</div>}
+          </>)}
+
+          {/* ── CANAIS ── */}
+          {subAba==="canais"&&(
+            <Section title="🛒 Canais de Venda Configurados">
+              {Object.entries(CANAIS).map(([id,c])=>{
+                const vendasCanal=vendas.filter(v=>v.canal===id);
+                const fat=vendasCanal.reduce((a,v)=>{const p=produtos.find(x=>x.id===v.produtoId);return a+(p?p.venda*v.qtd:0);},0);
+                return (
+                  <div key={id} style={{padding:"14px 14px",borderBottom:1px solid ${C.border}}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
+                      <div style={{display:"flex",gap:10,alignItems:"center"}}>
+                        <div style={{width:42,height:42,borderRadius:12,background:${c.cor}18,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>{c.icon}</div>
+                        <div>
+                          <div style={{fontWeight:800,fontSize:14}}>{c.label}</div>
+                          <div style={{fontSize:10,color:C.muted}}>{vendasCanal.length} venda{vendasCanal.length!==1?"s":""} · {fmt(fat)} faturado</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+                      <div style={{background:C.bg,borderRadius:10,padding:"8px 10px"}}>
+                        <div style={{fontSize:9,color:C.muted}}>Taxa Percentual</div>
+                        <div style={{fontSize:13,fontWeight:800,color:C.orange}}>{(c.taxaPct*100).toFixed(0)}% da venda</div>
+                      </div>
+                      <div style={{background:C.bg,borderRadius:10,padding:"8px 10px"}}>
+                        <div style={{fontSize:9,color:C.muted}}>Taxa Fixa</div>
+                        <div style={{fontSize:13,fontWeight:800,color:C.orange}}>R$ {c.taxaFixa.toFixed(2)}</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </Section>
+          )}
+
+          {/* ── CURVA ABC ── */}
+          {subAba==="curva"&&(
+            <Section title="📊 Curva ABC — Classificação de Produtos">
+              <div style={{padding:"10px 14px 6px",fontSize:11,color:C.muted,lineHeight:1.6}}>
+                <span style={{color:C.gold,fontWeight:800}}>A</span> = 80% do faturamento &nbsp;·&nbsp; <span style={{color:C.blue,fontWeight:800}}>B</span> = 95% acumulado &nbsp;·&nbsp; <span style={{color:C.muted,fontWeight:800}}>C</span> = demais
+              </div>
+              {curvaABC.length===0&&<div style={{padding:"16px 14px",color:C.muted,fontSize:13}}>Nenhuma venda registrada ainda.</div>}
+              {curvaABC.map((p,i)=>{
+                const corC=p.curva==="A"?C.gold:p.curva==="B"?C.blue:C.muted;
+                const totalFat=curvaABC.reduce((a,x)=>a+x.fat,0);
+                const pct=totalFat>0?(p.fat/totalFat)*100:0;
+                const r=calcFinanceiro(p.custo,p.venda);
+                return (
+                  <div key={p.id} style={{padding:"13px 14px",borderBottom:1px solid ${C.border}}}>
+                    <div style={{display:"flex",gap:10,alignItems:"center",marginBottom:8}}>
+                      {p.fotos?.[0]?<img src={p.fotos[0]} alt="" style={{width:40,height:40,borderRadius:10,objectFit:"cover",flexShrink:0}}/>
+                        :<div style={{width:40,height:40,borderRadius:10,background:${corC}18,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,color:corC,fontSize:16,flexShrink:0}}>{p.curva}</div>}
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontWeight:700,fontSize:13,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{p.nome}</div>
+                        <div style={{fontSize:10,color:C.muted}}>{fmt(p.fat)} · {fmtP(pct)} do total · Markup {fmtP(r?.markup)}</div>
+                        <div style={{height:3,background:C.border,borderRadius:2,marginTop:5}}>
+                          <div style={{height:"100%",width:${Math.min(pct,100)}%,background:corC,borderRadius:2}}/>
+                        </div>
+                      </div>
+                      <Badge color={p.curva==="A"?"gold":p.curva==="B"?"blue":undefined} sm>{p.curva}</Badge>
+                    </div>
+                  </div>
+                );
+              })}
+            </Section>
+          )}
+        </div>
+      )}
+
+      {/* ══ PRODUTOS ═══════════════════════════════════════════════════ */}
+      {aba==="produtos"&&(
+        <div style={{padding:"16px 14px 0"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:16,marginBottom:14}}>
+            <div><div style={{fontSize:20,fontWeight:900}}>Produtos</div><div style={{fontSize:12,color:C.muted}}>{produtos.length} cadastrados</div></div>
+            <Btn sm onClick={()=>abrirProd("novo")}>+ Novo</Btn>
+          </div>
+          <Inp placeholder="🔍 Buscar produto..." value={busca} onChange={e=>setBusca(e.target.value)} style={{marginBottom:14}}/>
+          {prodFiltrados.length===0&&<div style={{textAlign:"center",padding:"40px 0",color:C.muted}}><div style={{fontSize:40}}>⌚</div><div style={{marginTop:12,fontSize:14}}>{busca?"Nenhum resultado.":"Nenhum produto ainda."}</div></div>}
+          <div style={{display:"flex",flexDirection:"column",gap:14}}>
+            {prodFiltrados.map(p=>{
+              const r=calcFinanceiro(p.custo,p.venda,p.canaisAtivos?.[0]||"fisico");
+              const forn=fornecedores.find(f=>f.id===p.fornecedorId);
+              const baixo=p.estoque<=p.minEstoque&&p.minEstoque>0;
+              return (
+                <div key={p.id} style={{background:C.card,borderRadius:18,border:1px solid ${baixo?"rgba(248,113,113,0.4)":C.border},overflow:"hidden"}}>
+                  {p.fotos?.length>0?(
+                    <div style={{display:"flex",gap:1}}>
+                      {p.fotos.map((f,i)=><img key={i} src={f} alt="" onClick={()=>setLightbox(f)} style={{width:p.fotos.length===1?"100%":"50%",height:130,objectFit:"cover",cursor:"zoom-in"}}/>)}
+                    </div>
+                  ):<div style={{height:60,background:C.dim,display:"flex",alignItems:"center",justifyContent:"center",fontSize:30}}>⌚</div>}
+                  <div style={{padding:"13px 13px"}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontWeight:800,fontSize:15,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{p.nome}</div>
+                        <div style={{fontSize:11,color:C.muted}}>{p.modelo}{p.cor?` · ${p.cor}`:""}</div>
+                      </div>
+                      <div style={{marginLeft:8}}>{baixo?<Badge color="red">⚠️ Baixo</Badge>:<Badge color="green">✓ OK</Badge>}</div>
+                    </div>
+                    {/* Canais ativos */}
+                    {p.canaisAtivos?.length>0&&(
+                      <div style={{display:"flex",gap:4,flexWrap:"wrap",marginBottom:10}}>
+                        {p.canaisAtivos.map(cid=>{const c=CANAIS[cid];return c?<Badge key={cid} color="blue" sm>{c.icon} {c.label}</Badge>:null;})}
+                      </div>
+                    )}
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6,marginBottom:10}}>
+                      {[
+                        {l:"Custo",   v:fmt(p.custo),       c:C.text},
+                        {l:"Venda",   v:fmt(p.venda),       c:C.gold},
+                        {l:"Estoque", v:${p.estoque} un., c:baixo?C.red:C.text},
+                        {l:"Luc. Liq.",v:fmt(r?.lucroL),   c:r?.lucroL>0?C.green:C.red},
+                        {l:"Markup",  v:fmtP(r?.markup),    c:C.purple},
+                        {l:"Margem",  v:fmtP(r?.margem),    c:C.blue},
+                      ].map(i=>(
+                        <div key={i.l} style={{background:C.bg,borderRadius:10,padding:"8px 8px"}}>
+                          <div style={{fontSize:9,color:C.muted}}>{i.l}</div>
+                          <div style={{fontSize:12,fontWeight:800,color:i.c}}>{i.v}</div>
+                        </div>
+                      ))}
+                    </div>
+                    {forn&&<div style={{fontSize:11,color:C.muted,marginBottom:10}}>🏭 {forn.nome}</div>}
+                    <div style={{display:"flex",gap:8}}>
+                      <Btn variant="outline" sm style={{flex:1}} onClick={()=>abrirProd(p)}>✏️ Editar</Btn>
+                      <Btn variant="danger" sm onClick={()=>{if(window.confirm("Excluir produto?"))setProdutos(prev=>prev.filter(x=>x.id!==p.id));}}>🗑️</Btn>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ══ VENDAS ═════════════════════════════════════════════════════ */}
+      {aba==="vendas"&&(
+        <div style={{padding:"16px 14px 0"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:16,marginBottom:14}}>
+            <div><div style={{fontSize:20,fontWeight:900}}>Vendas</div><div style={{fontSize:12,color:C.muted}}>{vendas.length} registradas · {vendasMes.length} este mês</div></div>
+            <Btn sm onClick={()=>setModalVenda(true)}>+ Venda</Btn>
+          </div>
+          {vendas.length===0&&<div style={{textAlign:"center",padding:"40px 0",color:C.muted}}><div style={{fontSize:40}}>💰</div><div style={{marginTop:12,fontSize:14}}>Nenhuma venda ainda.</div></div>}
+          <div style={{display:"flex",flexDirection:"column",gap:10}}>
+            {[...vendas].reverse().map(v=>{
+              const p=produtos.find(x=>x.id===v.produtoId);
+              const r=p?calcFinanceiro(p.custo,p.venda,v.canal):null;
+              const canal=CANAIS[v.canal]||CANAIS.fisico;
+              return (
+                <div key={v.id} style={{background:C.card,borderRadius:16,border:1px solid ${C.border},padding:"13px 13px",cursor:"pointer"}} onClick={()=>p&&setDetalheVenda({venda:v,produto:p})}>
+                  <div style={{display:"flex",gap:10,alignItems:"center",marginBottom:8}}>
+                    {p?.fotos?.[0]?<img src={p.fotos[0]} alt="" style={{width:42,height:42,borderRadius:12,objectFit:"cover",flexShrink:0}}/>
+                      :<div style={{width:42,height:42,borderRadius:12,background:C.dim,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>⌚</div>}
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontWeight:800,fontSize:14,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{p?.nome??"Produto removido"}</div>
+                      <div style={{fontSize:11,color:C.muted}}>{canal.icon} {canal.label} · {v.hora&&`${v.hora} · `}{v.data} · ×{v.qtd}</div>
+                    </div>
+                    <div style={{textAlign:"right",flexShrink:0}}>
+                      <div style={{fontWeight:900,color:C.gold,fontSize:14}}>{fmt((p?.venda??0)*v.qtd)}</div>
+                      <div style={{fontSize:10,color:C.green}}>+{fmt(r?r.lucroL*v.qtd:0)} liq.</div>
+                    </div>
+                  </div>
+                  <div style={{display:"flex",gap:6,alignItems:"center"}}>
+                    {v.cliente&&<Badge color="blue" sm>{v.cliente}</Badge>}
+                    <Badge color="blue" sm>{v.formaPag}</Badge>
+                    <span style={{fontSize:10,color:C.dim,marginLeft:"auto"}}>Ver comprovante →</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ══ ESTOQUE ════════════════════════════════════════════════════ */}
+      {aba==="estoque"&&(
+        <div style={{padding:"16px 14px 0"}}>
+          <div style={{paddingTop:16,marginBottom:14}}>
+            <div style={{fontSize:20,fontWeight:900}}>Estoque & Previsão</div>
+            <div style={{fontSize:12,color:C.muted}}>Alertas e projeções de reposição</div>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:14}}>
+            <KPI label="Total Unidades" value={produtos.reduce((a,p)=>a+p.estoque,0)} accent={C.blue} icon="📦"/>
+            <KPI label="Alertas" value={kpis.alertas} accent={kpis.alertas>0?C.red:C.green} icon={kpis.alertas>0?"⚠️":"✅"}/>
+          </div>
+
+          {/* Previsão */}
+          <Section title="🔮 Previsão de Reposição">
+            <div style={{padding:"8px 14px",fontSize:10,color:C.muted,background:"rgba(96,165,250,0.05)",borderBottom:1px solid ${C.border}}}>Baseado na média mensal configurada em cada produto.</div>
+            {previsoes.length===0&&<div style={{padding:16,color:C.muted,fontSize:13}}>Sem produtos cadastrados.</div>}
+            {previsoes.map(p=>{
+              const cor=p.status==="critico"?C.red:p.status==="atencao"?C.gold:p.status==="sem"?C.dim:C.green;
+              return (
+                <div key={p.id} style={{padding:"13px 14px",borderBottom:1px solid ${C.border}}}>
+                  <div style={{display:"flex",gap:10,alignItems:"center",marginBottom:8}}>
+                    {p.fotos?.[0]?<img src={p.fotos[0]} alt="" style={{width:38,height:38,borderRadius:10,objectFit:"cover",flexShrink:0}}/>
+                      :<div style={{width:38,height:38,borderRadius:10,background:C.dim,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>⌚</div>}
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontWeight:700,fontSize:13,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{p.nome}</div>
+                      <div style={{fontSize:10,color:C.muted}}>Estoque: {p.estoque} · Média: {p.mediaVendasMes||0}/mês</div>
+                    </div>
+                    <div style={{textAlign:"right",flexShrink:0}}>
+                      {p.dias!==null?<div style={{fontWeight:900,color:cor,fontSize:16}}>{p.dias}d</div>:<div style={{color:C.dim,fontSize:11}}>Sem média</div>}
+                      <div style={{fontSize:9,color:C.dim}}>restantes</div>
+                    </div>
+                  </div>
+                  {p.dias!==null&&<div style={{height:4,background:C.border,borderRadius:2,marginBottom:6}}><div style={{height:"100%",width:${Math.min((p.dias/60)*100,100)}%,background:cor,borderRadius:2}}/></div>}
+                  {p.repor>0&&<div style={{fontSize:11,color:cor,fontWeight:700}}>↩️ Repor {p.repor} un. (ideal: {p.ideal} un.)</div>}
+                </div>
+              );
+            })}
+          </Section>
+        </div>
+      )}
+
+      {/* ══ FORNECEDORES ═══════════════════════════════════════════════ */}
+      {aba==="fornecedores"&&(
+        <div style={{padding:"16px 14px 0"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:16,marginBottom:14}}>
+            <div><div style={{fontSize:20,fontWeight:900}}>Fornecedores</div><div style={{fontSize:12,color:C.muted}}>{fornecedores.length} cadastrados</div></div>
+            <Btn sm onClick={()=>{setFf(FORN0);setModalForn("novo");}}>+ Novo</Btn>
+          </div>
+          {fornecedores.length===0&&<div style={{textAlign:"center",padding:"40px 0",color:C.muted}}><div style={{fontSize:40}}>🏭</div><div style={{marginTop:12,fontSize:14}}>Nenhum fornecedor ainda.</div></div>}
+          <div style={{display:"flex",flexDirection:"column",gap:12}}>
+            {fornecedores.map(f=>{
+              const prods=produtos.filter(p=>p.fornecedorId===f.id);
+              return (
+                <div key={f.id} style={{background:C.card,borderRadius:16,border:1px solid ${C.border},padding:16}}>
+                  <div style={{fontWeight:800,fontSize:15,marginBottom:6}}>🏭 {f.nome}</div>
+                  {f.contato&&<div style={{fontSize:12,color:C.muted,marginBottom:2}}>📞 {f.contato}</div>}
+                  {f.email&&<div style={{fontSize:12,color:C.muted,marginBottom:2}}>✉️ {f.email}</div>}
+                  {f.cidade&&<div style={{fontSize:12,color:C.muted,marginBottom:8}}>📍 {f.cidade}</div>}
+                  <div style={{fontSize:11,color:C.dim,marginBottom:12}}>{prods.length===0?"Sem produtos vinculados":prods.map(p=>⌚ ${p.nome}).join(" · ")}</div>
+                  <div style={{display:"flex",gap:8}}>
+                    <Btn variant="outline" sm style={{flex:1}} onClick={()=>{setFf({nome:f.nome,contato:f.contato,cidade:f.cidade,email:f.email||""});setModalForn(f);}}>✏️ Editar</Btn>
+                    <Btn variant="danger" sm onClick={()=>{if(window.confirm("Excluir fornecedor?"))setFornecedores(prev=>prev.filter(x=>x.id!==f.id));}}>🗑️</Btn>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── Bottom Tab Bar ─────────────────────────────────────────────── */}
+      <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:480,background:C.surface,borderTop:1px solid ${C.border},display:"flex",zIndex:500,paddingBottom:"env(safe-area-inset-bottom,8px)"}}>
+        {tabs.map(t=>(
+          <button key={t.id} onClick={()=>setAba(t.id)} style={{flex:1,padding:"10px 0 6px",background:"transparent",border:"none",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3,position:"relative",fontFamily:"inherit"}}>
+            {t.id==="estoque"&&kpis.alertas>0&&<div style={{position:"absolute",top:5,right:"calc(50% - 16px)",width:8,height:8,background:C.red,borderRadius:99,border:2px solid ${C.surface}}}/>}
+            <span style={{fontSize:20}}>{t.icon}</span>
+            <span style={{fontSize:9,fontWeight:700,color:aba===t.id?C.gold:C.muted,textTransform:"uppercase",letterSpacing:.3}}>{t.label}</span>
+            {aba===t.id&&<div style={{position:"absolute",bottom:0,width:28,height:2,background:C.gold,borderRadius:2}}/>}
+          </button>
+        ))}
+      </div>
+
+      {/* ══ MODAIS ═════════════════════════════════════════════════════ */}
+
+      {/* Modal Produto */}
+      {modalProd!==null&&(
+        <div style={overlayStyle} onClick={e=>{if(e.target===e.currentTarget)setModalProd(null);}}>
+          <div style={sheetStyle}>
+            <Handle/>
+            <div style={{fontWeight:900,fontSize:18,marginBottom:20}}>{modalProd==="novo"?"⌚ Novo Produto":"✏️ Editar Produto"}</div>
+            <div style={{display:"flex",flexDirection:"column",gap:14}}>
+              <FotoUpload fotos={fp.fotos||[]} onChange={fotos=>setFp(p=>({...p,fotos}))}/>
+              <Inp label="Nome do Produto *" value={fp.nome} onChange={e=>setFp(p=>({...p,nome:e.target.value}))} placeholder="Ex: Apple Watch Series 9"/>
+              <div style={{display:"flex",gap:10}}>
+                <Inp label="Modelo" value={fp.modelo} onChange={e=>setFp(p=>({...p,modelo:e.target.value}))} placeholder="45mm GPS"/>
+                <Inp label="Cor / Variação" value={fp.cor} onChange={e=>setFp(p=>({...p,cor:e.target.value}))} placeholder="Midnight"/>
+              </div>
+              <Sel label="Fornecedor" value={fp.fornecedorId} onChange={e=>setFp(p=>({...p,fornecedorId:e.target.value}))}>
+                <option value="">— Selecionar fornecedor —</option>
+                {fornecedores.map(f=><option key={f.id} value={f.id}>{f.nome}</option>)}
+              </Sel>
+              <div style={{display:"flex",gap:10}}>
+                <Inp label="Custo (R$) *" type="number" value={fp.custo} onChange={e=>setFp(p=>({...p,custo:e.target.value}))} placeholder="0,00" inputMode="decimal"/>
+                <Inp label="Venda (R$) *" type="number" value={fp.venda} onChange={e=>setFp(p=>({...p,venda:e.target.value}))} placeholder="0,00" inputMode="decimal"/>
+              </div>
+              <div style={{display:"flex",gap:10}}>
+                <Inp label="Estoque Atual" type="number" value={fp.estoque} onChange={e=>setFp(p=>({...p,estoque:e.target.value}))} placeholder="0" inputMode="numeric"/>
+                <Inp label="Estoque Mínimo" type="number" value={fp.minEstoque} onChange={e=>setFp(p=>({...p,minEstoque:e.target.value}))} placeholder="0" inputMode="numeric"/>
+              </div>
+              <Inp label="Média Vendas / Mês" type="number" value={fp.mediaVendasMes} onChange={e=>setFp(p=>({...p,mediaVendasMes:e.target.value}))} placeholder="Ex: 5 (para previsão de estoque)" inputMode="numeric"/>
+
+              {/* Canais de venda */}
+              <div>
+                <label style={{fontSize:10,color:C.muted,fontWeight:700,letterSpacing:.6,textTransform:"uppercase",display:"block",marginBottom:8}}>Canais de Venda (selecione todos que usa)</label>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                  {Object.entries(CANAIS).map(([id,c])=>{
+                    const sel=(fp.canaisAtivos||[]).includes(id);
+                    return (
+                      <button key={id} onClick={()=>setFp(p=>({...p,canaisAtivos:sel?(p.canaisAtivos||[]).filter(x=>x!==id):[...(p.canaisAtivos||[]),id]}))}
+                        style={{background:sel?${c.cor}18:C.bg,border:1.5px solid ${sel?c.cor:C.border},borderRadius:12,padding:"10px 10px",cursor:"pointer",display:"flex",alignItems:"center",gap:8,textAlign:"left",fontFamily:"inherit"}}>
+                        <span style={{fontSize:18}}>{c.icon}</span>
+                        <div>
+                          <div style={{fontSize:11,fontWeight:sel?800:600,color:sel?c.cor:C.muted,lineHeight:1.2}}>{c.label}</div>
+                          <div style={{fontSize:9,color:C.dim,marginTop:1}}>{c.taxaPct>0?${(c.taxaPct*100).toFixed(0)}% + R$${c.taxaFixa}:R$${c.taxaFixa} taxa}</div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <FinPanel custo={fp.custo} venda={fp.venda} canalId={(fp.canaisAtivos||["fisico"])[0]||"fisico"}/>
+              <div style={{display:"flex",gap:10}}>
+                <Btn variant="ghost" style={{flex:1}} onClick={()=>setModalProd(null)}>Cancelar</Btn>
+                <Btn style={{flex:2}} onClick={salvarProd}>{modalProd==="novo"?"✅ Cadastrar":"✅ Salvar"}</Btn>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Fornecedor */}
+      {modalForn!==null&&(
+        <div style={overlayStyle} onClick={e=>{if(e.target===e.currentTarget)setModalForn(null);}}>
+          <div style={sheetStyle}>
+            <Handle/>
+            <div style={{fontWeight:900,fontSize:18,marginBottom:20}}>🏭 {modalForn==="novo"?"Novo Fornecedor":"Editar Fornecedor"}</div>
+            <div style={{display:"flex",flexDirection:"column",gap:14}}>
+              <Inp label="Nome da Empresa *" value={ff.nome} onChange={e=>setFf(p=>({...p,nome:e.target.value}))} placeholder="Ex: Tech Import Brasil"/>
+              <Inp label="Telefone / WhatsApp" value={ff.contato} onChange={e=>setFf(p=>({...p,contato:e.target.value}))} placeholder="(11) 99999-0000" inputMode="tel"/>
+              <Inp label="E-mail" value={ff.email} onChange={e=>setFf(p=>({...p,email:e.target.value}))} placeholder="contato@empresa.com" inputMode="email"/>
+              <Inp label="Cidade" value={ff.cidade} onChange={e=>setFf(p=>({...p,cidade:e.target.value}))} placeholder="São Paulo"/>
+              <div style={{display:"flex",gap:10}}>
+                <Btn variant="ghost" style={{flex:1}} onClick={()=>setModalForn(null)}>Cancelar</Btn>
+                <Btn style={{flex:2}} onClick={salvarForn}>✅ Salvar</Btn>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Venda */}
+      {modalVenda&&(
+        <div style={overlayStyle} onClick={e=>{if(e.target===e.currentTarget)setModalVenda(false);}}>
+          <div style={sheetStyle}>
+            <Handle/>
+            <div style={{fontWeight:900,fontSize:18,marginBottom:20}}>💰 Registrar Venda</div>
+            <div style={{display:"flex",flexDirection:"column",gap:14}}>
+              <Sel label="Produto *" value={fv.produtoId} onChange={e=>setFv(p=>({...p,produtoId:e.target.value,canal:produtos.find(x=>x.id===+e.target.value)?.canaisAtivos?.[0]||"fisico"}))}>
+                <option value="">— Selecionar produto —</option>
+                {produtos.filter(p=>p.estoque>0).map(p=><option key={p.id} value={p.id}>{p.nome} · {p.modelo} · Estoque: {p.estoque}</option>)}
+              </Sel>
+
+              {/* Preview produto */}
+              {prodVendaSelecionado?.fotos?.[0]&&(
+                <div style={{display:"flex",gap:12,background:C.bg,borderRadius:14,padding:12,alignItems:"center"}}>
+                  <img src={prodVendaSelecionado.fotos[0]} alt="" style={{width:52,height:52,borderRadius:12,objectFit:"cover"}}/>
+                  <div>
+                    <div style={{fontWeight:800,fontSize:14}}>{prodVendaSelecionado.nome}</div>
+                    <div style={{fontSize:11,color:C.muted}}>{prodVendaSelecionado.modelo} · Venda: {fmt(prodVendaSelecionado.venda)}</div>
+                  </div>
+                </div>
+              )}
+
+              {/* Canal de venda */}
+              <CanalSelector value={fv.canal} onChange={canal=>setFv(p=>({...p,canal}))}/>
+
+              <div style={{display:"flex",gap:10}}>
+                <Inp label="Quantidade" type="number" value={fv.qtd} onChange={e=>setFv(p=>({...p,qtd:e.target.value}))} min="1" inputMode="numeric"/>
+                <Inp label="Data" type="date" value={fv.data} onChange={e=>setFv(p=>({...p,data:e.target.value}))}/>
+              </div>
+              <Inp label="Horário da Venda" type="time" value={fv.hora} onChange={e=>setFv(p=>({...p,hora:e.target.value}))}/>
+              <Inp label="Cliente (opcional)" value={fv.cliente} onChange={e=>setFv(p=>({...p,cliente:e.target.value}))} placeholder="Nome do cliente"/>
+              <Sel label="Forma de Pagamento" value={fv.formaPag} onChange={e=>setFv(p=>({...p,formaPag:e.target.value}))}>
+                {FORMAS_PAG.map(f=><option key={f}>{f}</option>)}
+              </Sel>
+
+              {/* Prévia financeira com canal */}
+              {prodVendaSelecionado&&(()=>{
+                const r=calcFinanceiro(prodVendaSelecionado.custo,prodVendaSelecionado.venda,fv.canal);
+                const canal=CANAIS[fv.canal]||CANAIS.fisico;
+                return (
+                  <div style={{background:C.bg,borderRadius:14,padding:14,border:1px solid ${C.border}}}>
+                    <div style={{fontSize:10,color:C.muted,fontWeight:700,textTransform:"uppercase",marginBottom:10}}>
+                      Prévia — {canal.icon} {canal.label}
+                    </div>
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                      {[
+                        {l:"Total Recebido",  v:fmt(prodVendaSelecionado.venda*+fv.qtd), c:C.gold},
+                        {l:"Taxa do Canal",   v:fmt(r?r.taxaCanal*+fv.qtd:0), c:C.orange},
+                        {l:"Lucro Bruto",     v:fmt(r?r.lucroB*+fv.qtd:0), c:C.green},
+                        {l:"Lucro Líquido",   v:fmt(r?r.lucroL*+fv.qtd:0), c:r?.lucroL>0?C.green:C.red},
+                      ].map(i=>(
+                        <div key={i.l} style={{background:C.card,borderRadius:10,padding:"10px 12px"}}>
+                          <div style={{fontSize:9,color:C.muted}}>{i.l}</div>
+                          <div style={{fontSize:15,fontWeight:900,color:i.c}}>{i.v}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              <div style={{display:"flex",gap:10}}>
+                <Btn variant="ghost" style={{flex:1}} onClick={()=>setModalVenda(false)}>Cancelar</Btn>
+                <Btn style={{flex:2}} onClick={registrarVenda}>✅ Confirmar Venda</Btn>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Comprovante */}
+      {comprovante&&<Comprovante venda={comprovante.venda} produto={comprovante.produto} onFechar={()=>setComprovante(null)}/>}
+      {detalheVenda?.produto&&<Comprovante venda={detalheVenda.venda} produto={detalheVenda.produto} onFechar={()=>setDetalheVenda(null)}/>}
+
+      {/* Lightbox */}
+      {lightbox&&(
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.96)",zIndex:4000,display:"flex",alignItems:"center",justifyContent:"center"}} onClick={()=>setLightbox(null)}>
+          <img src={lightbox} alt="" style={{maxWidth:"92%",maxHeight:"85vh",borderRadius:18,objectFit:"contain"}}/>
+          <button onClick={()=>setLightbox(null)} style={{position:"absolute",top:20,right:20,width:40,height:40,borderRadius:99,background:"rgba(255,255,255,0.1)",border:"none",color:"#fff",fontSize:18,cursor:"pointer"}}>✕</button>
+        </div>
+      )}
+
+      {/* Toast */}
+      {toast&&(
+        <div style={{position:"fixed",bottom:90,left:"50%",transform:"translateX(-50%)",zIndex:5000,background:toast.type==="err"?C.red:C.green,color:"#07090F",fontWeight:800,fontSize:13,padding:"12px 22px",borderRadius:12,whiteSpace:"nowrap",boxShadow:"0 4px 32px rgba(0,0,0,0.6)"}}>
+          {toast.type==="err"?"⚠️ ":"✅ "}{toast.msg}
+        </div>
+      )}
+    </div>
+  );
+}
+</body>
+</html>

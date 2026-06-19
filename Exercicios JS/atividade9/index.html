@@ -4,17 +4,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exercício: Lista de Tarefas Simples</title>
+    <style>
+        body{
+            background-color: lightgray;
+            display: flex;
+            flex-flow: nowrap column;
+            justify-content: center;
+            align-items: center;
+            height: 90vh;
+        }
+
+        div {
+            background-color: rgb(0, 139, 139);
+            padding: 30px;
+            border: 5px solid rgb(05, 63, 41);
+            border-radius: 30px;
+            display: flex;
+            flex-flow:nowrap column;
+            justify-items: center;
+            align-items: center;
+        }
+
+        ul {
+            list-style-type: circle;
+            list-style-position: inside;
+        }
+
+        li{
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        input {
+            padding: 10px;
+            background-color: rgb(243, 240, 149);
+            border: 3px solid black;  
+            border-radius: 10px; 
+            color: black;
+            font-size: 15px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Lista de Tarefas</h1>
-    
-    <ul>
-        <li>Algum item 1</li>
-        <li>Algum item 2</li>
-    </ul>
+    <div>
+        <h1>Lista de Tarefas</h1>
+        
+        <ul>
+            <li>Acordar</li>
+            <li>Arrumar a cama</li>
+        </ul>
 
-    <input type="text" placeholder="Digite uma tarefa">
-
+        <input type="text" placeholder="Digite uma tarefa">
+    </div>
     <script src="JS/script.js"></script>
 </body>
 </html>
