@@ -1,5 +1,9 @@
 @charset "UTF-8";
 
+*{
+    font-family: Arial, Helvetica, sans-serif;
+}
+
 body {
     margin: 0px;
     padding: 0px;
@@ -26,11 +30,102 @@ header {
 }
 
 .menu {
-
+    
+    display: flex;
+    align-items: center;
+    
 }
 
 nav ul, nav li {
     list-style: none;
     margin: 0px;
     padding: 0px;
+}
+
+nav ul {
+    display: flex;
+
+}
+
+nav a {
+    display: block;
+    padding: 15px;
+    text-decoration: none;
+    text-transform: uppercase;
+    color: #727272;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+nav .ativo a ,nav a:hover{
+    background-color: #e71727;
+    color: white;
+}
+
+#banner {
+    display: flex;
+    justify-content: center;
+    
+    background-image: url('imagens/coca-cola-banner.jpg');
+    background-position: center;
+    background-size: cover;
+    height: 670px;
+}
+
+.coluna {
+    flex-direction: column;
+}
+
+.banner_headline{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.banner_headline h2{
+    color: white;
+    font-size: 25px;
+    text-shadow: 5px 5px 5px black, 5px 5px 5px #e71727;
+    margin: 0px;
+    padding: 0px;
+    max-width: 350px;
+}
+
+.banner_headline h1 {
+    color: white;
+    font-size: 50px;
+    text-shadow: 5px 5px 5px black, 5px 5px 5px #e71727;
+    margin: 0px;
+    padding: 0px;
+    max-width: 350px;
+}
+
+.banner_options{
+    height: 210px;
+    display: flex;
+    color: white;
+}
+
+.banner1, .banner2, .banner3 {
+    flex: 1;
+    padding: 20px;
+
+}
+
+.banner1{
+    background-color: #ff414d;
+}
+.banner2{
+    background-color: #e71727;
+}
+.banner3{
+    background-color: #9e0c0c;
+}
+
+.banner_title{
+    font-size: 21px;font-weight: bold;
+}
+.banner_desc {
+    font-size: 15px;
+    text-align: justify;
+    margin: 10px 0px;
 }
