@@ -129,3 +129,55 @@ nav .ativo a ,nav a:hover{
     text-align: justify;
     margin: 10px 0px;
 }
+
+.banner3 ul{
+    height: 130px;
+    display: flex;
+    flex-flow: nowrap column;
+    justify-content: space-evenly;
+    padding: 0px;
+}
+
+.banner3 ul li{
+    width: 100%;
+    list-style-type: none;
+    padding: 7px 0px;
+    border-bottom:2px solid white;
+}
+
+.banner3 ul .sem_linha{
+    border: none;
+}
+
+#geral {
+    display: flex;
+    justify-content: center;
+}
+
+#geral section {
+    flex: 2;
+    background-color: aqua;
+}
+
+#geral aside {
+    flex: 1;
+    background-color: burlywood;
+}
+
+.widget_title{
+    margin: 30px 0px 20px 0px;
+}
+
+.widget_title_text {
+    color: black;
+    font-size: 21px;
+    font-weight: bold;
+}
+
+.widget_title_bar {
+    width: 50px;
+    height: 2px;
+    background-color: #e71727;
+    margin-top: 8px;
+    flex-grow: ;
+}
