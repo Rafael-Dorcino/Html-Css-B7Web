@@ -61,6 +61,20 @@ nav .ativo a ,nav a:hover{
     color: white;
 }
 
+.menumobile {
+    display: none;
+    width: 40px;
+    height: 40px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+.mm_line{
+    height: 4px;
+    background-color: #e71727;
+    border-radius: 30%;
+}
+
 #banner {
     display: flex;
     justify-content: center;
@@ -188,8 +202,7 @@ nav .ativo a ,nav a:hover{
     display: flex;
     flex-flow: nowrap column;
     align-items: center;
-    margin: 0%;
-    padding: 0px;
+    
 }
 
 .widget_body div.unidades {
@@ -378,13 +391,21 @@ footer ul li a:hover {
 @media(max-width:600px) {
 
     header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 5%;
-  background-color: #fff;
-}
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 5%;
+    }
     
+    .logo{
+        margin-bottom: 10px;
+    }
+
+    .menumobile {
+        display: flex;
+        flex-flow: nowrap column;
+        justify-content: space-around;
+    }
     
     .banner_headline h2 {
         font-size: 21px;
@@ -413,7 +434,7 @@ footer ul li a:hover {
         margin-bottom: 50px;
     }
 
-    #produtos{
+    section #produtos{
         height: auto;
         margin-bottom: 60px;
     }
@@ -429,11 +450,15 @@ footer ul li a:hover {
         flex: 1;
     }
 
-    .widget_body_oport form {
+    .widget_title .widget_body_oport{
         display: flex;
-        
-        
+        flex-flow: nowrap column;
+        align-items: center;
+        width: 100%;
+    }
 
+    .widget_title .widget_body_oport form {
+        border-radius: 10px;
     }
 
     .footer_menu{
@@ -448,4 +473,18 @@ footer ul li a:hover {
     .footer_copy{
         padding: 20px;
     }
+
+    header {
+        height: auto;
+    }
+
+    header .container{
+        flex-direction: row;
+    }
+
+    nav ul {
+        flex-direction: column;
+        display: none;
+    }
+
 }
