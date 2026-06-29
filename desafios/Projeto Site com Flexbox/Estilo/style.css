@@ -68,7 +68,7 @@ nav .ativo a ,nav a:hover{
     background-image: url('imagens/coca-cola-banner.jpg');
     background-position: center;
     background-size: cover;
-    height: 670px;
+    height: 770px;
 }
 
 .coluna {
@@ -80,6 +80,7 @@ nav .ativo a ,nav a:hover{
     display: flex;
     flex-direction: column;
     justify-content: center;
+    margin-left: 10px;
 }
 .banner_headline h2{
     color: white;
@@ -100,7 +101,7 @@ nav .ativo a ,nav a:hover{
 }
 
 .banner_options{
-    height: 210px;
+    height: auto;
     display: flex;
     color: white;
 }
@@ -249,7 +250,7 @@ nav .ativo a ,nav a:hover{
 .widget_body article {
     display: flex;
     flex-flow: wrap row;
-    justify-content: space-between;
+    justify-content: space-around;
     align-content: space-between;
     height: 1000px;
 }
@@ -275,4 +276,176 @@ nav .ativo a ,nav a:hover{
     border-top: 5px solid lightgray;
     padding: 16px 5px 5px 5px;
     color: #837C7C;
+}
+
+footer {
+    display: flex;
+    justify-content: center;
+    background-color: #161616;
+    
+}
+
+.footer_menu{
+    display: flex;
+}
+
+.fm_1, .fm_2, .fm_3 {
+    flex: 1;
+    color: white;
+    padding: 20px;
+}
+
+.fm_1{
+    background-color: #ff414d;
+}
+
+.fm_2{
+    background-color: #e71727;
+}
+
+.fm_3{
+    background-color: #9e0c0c;
+}
+
+.footer_area{
+    display: flex;
+    background-color: #161616;
+    
+}
+
+.flexcolumn{
+    flex-flow: nowrap column;
+}
+
+.footer_area_item{
+    flex: 1;
+    color: white;
+}
+
+footer .widget_title_text {
+    color: white;
+}
+
+footer ul li{
+    margin-top: 15px;
+    
+}
+
+footer ul li a{
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+}
+
+footer ul li img {
+    width: 30px;
+    background-size: contain;
+    margin-right: 10px;
+}
+
+footer ul li.tel_coca img{
+    background-color: white;
+    padding: 2px;
+    border-radius: 50%;
+}
+
+footer ul li.whats_coca a img{
+    background-color: white;
+    
+    border-radius: 50%;
+    
+}
+
+footer ul li.insta_coca a img {
+    border-radius: 8px;
+}
+
+footer ul li a:hover {
+    color: #e71727;
+}
+
+.footer_copy {
+    border-top: 2px solid #2c2c2c;
+    height: 40px;
+    line-height: 40px;
+    color: #5c5c5c;
+    font-size: 12px;
+    margin-top: 30px;
+}
+
+@media(max-width:600px) {
+
+    header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 5%;
+  background-color: #fff;
+}
+    
+    
+    .banner_headline h2 {
+        font-size: 21px;
+    }
+    .banner_headline h1 {
+        font-size: 41px;
+    }
+
+    .banner_options{
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        color: white;
+    }
+
+    .container{
+        flex-direction: column;
+    }
+
+    #geral section {
+        padding: 20px;
+    }
+
+    article{
+        height: 1200px;
+        margin-bottom: 50px;
+    }
+
+    #produtos{
+        height: auto;
+        margin-bottom: 60px;
+    }
+
+    #geral aside {
+        padding: 50px;
+    }
+
+    div.widget_title {
+        display: flex;
+        flex-flow: nowrap column;
+        align-content: center;
+        flex: 1;
+    }
+
+    .widget_body_oport form {
+        display: flex;
+        
+        
+
+    }
+
+    .footer_menu{
+        flex-direction: column;
+    }
+
+    .footer_area{
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    .footer_copy{
+        padding: 20px;
+    }
 }
