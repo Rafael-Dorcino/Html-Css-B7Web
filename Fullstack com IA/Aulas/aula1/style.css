@@ -1,0 +1,52 @@
+@charset "UTF-8";
+*{
+    background-color: lightgray;
+}
+header {
+    border: 2px solid blue;
+    padding: 10px;
+    margin: 10px;
+}
+
+img {
+    width: 200px;
+    border-radius: 50%;
+}
+
+ul {
+    display: flex;
+    
+}
+
+li{
+    list-style-type: none;
+}
+
+li a{
+    list-style-type: none;
+    padding: 10px;
+    border: 2px solid black;
+    margin-right: 10px;
+}
+
+li a {
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+}
+
+li:hover a{
+    background-color: black;
+    color: white;
+}
+main{
+    border: 2px solid red;
+    padding: 10px;
+    margin: 10px;
+}
+
+footer{
+    border: 2px solid green;
+    padding: 10px;
+    margin: 10px;
+}
