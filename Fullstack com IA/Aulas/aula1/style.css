@@ -1,7 +1,17 @@
 @charset "UTF-8";
 *{
     background-color: lightgray;
+    box-sizing: border-box;
 }
+
+.box-1 {
+    width: 100px;
+    height: 50px;
+    background-color: rgb(117, 50, 205);
+    border: 10px solid black;
+    border-radius: 20px 0px ;
+}
+
 header {
     border: 2px solid blue;
     padding: 10px;
