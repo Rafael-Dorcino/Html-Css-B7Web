@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algoritmos</title>
+    <style>
+        body{
+            background-color: lightgray;
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: justify;
+        }
+
+        hr {
+            height: 2px;
+            background-color: brown;
+        }
+
+        h1 {
+            color: brown;
+        }
+
+        h3 {
+            color: darkgreen;
+        }
+    </style>
+</head>
+<body>
+    <h1>Algoritmos</h1>
+
+    <h3>Problema 1: Calculadora de desconto</h3>
+    <p>- Acima de R$ 100 ganha 10%</p>
+    <p>- Acima de R$ 200 ganha 20%</p>
+
+    <hr>
+
+    <h3>Problema 2: Verificador de senha fraca/média/forte</h3>
+    <p>- Baseado no comprimento</p>
+
+    <hr>
+
+    <h3>Problema 3: Mini chatbot de triagem médica</h3>
+    <p>- Tem febre?</p>
+    <p>- Tem tosse?</p>
+
+    <hr>
+
+    <h3>Repetição</h3>
+    <ul>
+        <li>Os principais comandos de repetição em JavaScript são: for, while e do...while. Eles servem para executar um bloco de código várias vezes de forma automática.</li>
+    </ul>
+    <p>- Contagem de 1 até 10</p>
+
+    <hr>
+
+    <h3>Funções</h3>
+    <ul>
+        <li>Funções em JavaScript são blocos de código reutilizáveis criados para executar tarefas específicas, representados principalmente por Função Declarada, Função Expressa e Arrow Function (função de seta). Elas ajudam a organizar o programa e evitam repetir códigos</li>
+    </ul>
+    <p>- Nome completo</p>
+
+    <h3>Arrays</h3>
+    <ul>
+        <li>Em JavaScript, um array é um objeto global utilizado para armazenar múltiplos valores em uma única variável. Eles possuem tamanho dinâmico, são indexados a partir do zero e podem conter elementos de tipos variados simultaneamente (strings, números, objetos, etc.).</li>
+    </ul>
+    <p>- Listas de frutas.</p>
+
+    <hr>
+
+    <h3>Array de objetos</h3>
+    <ul>
+        <li>Um array de objetos em JavaScript é uma lista estruturada onde cada item é um objeto com propriedades e valores. É essencial para armazenar e manipular conjuntos de dados complexos.</li>
+    </ul>
+    <p>- Nome e idade de clientes.</p>
+
+    <script>
+        let compra = 258
+
+        if(compra < 100){
+            console.log(`A compra foi no valor de ${compra}, não a desconto!`)
+        }else if(compra >= 100 && compra <= 199){
+            console.log(`A compra foi no valor de R$:${compra}, você tem desconto de 10%!`)
+            let desconto = compra * (10 / 100)
+            compra = compra - desconto
+            console.log(`Valor final: R$:${compra}`)
+        }else if(compra >= 200){
+            console.log(`A compra foi no valor de R$:${compra}, você tem desconto de 20%!`)
+            let desconto = compra * (20 / 100)
+            compra = compra - desconto
+            console.log(`Valor final: R$:${compra}`)
+        }
+
+        console.log("---------------------------------------")
+
+
+        let senha = "huckfodastico@"
+
+        let quant = senha.length
+
+        console.log(`Quantidade de caracteres da senha é ${quant}.`)
+
+        if(quant <= 5){
+            console.log('Sua senha é FRACA!')
+        } else if(quant > 5 && quant <= 10){
+            console.log('Sua Senha é MÉDIANA!')
+        } else if(quant > 10){
+            console.log('Sua senha é FORTE!')
+        }
+
+        console.log("---------------------------------------")
+
+        console.log('TRIAGEM MÉDICA')
+        console.log('O que você esta sentindo:')
+
+        console.log('Tem febre?')
+        let febre = false
+
+        console.log('Tem tosse?')
+        let tosse = true
+
+        if(febre == true && tosse == true){
+            console.log('O paciente esta com FEBRE e TOSSE!')
+        }else if(febre == true){
+            console.log('O paciente esta só com FEBRE!')
+        } else if(tosse == true){
+            console.log('O paciente esta só com TOSSE!')
+        } else{
+            console.log('O paciente NÃO esta sentindo nada!')
+        }
+
+        console.log("---------------------------------------")
+
+        for (let i = 1; i <= 10; i++) {
+            console.log("NÚmero: " + i)
+        }
+
+        console.log("---------------------------------------")
+
+        console.log('Qual é o seu nome?')
+        let nome = "Tony"
+        console.log('Qual é o seu sobrenome?')
+        let sobrenome = "Stark"
+
+        function ncomp(){
+            console.log(`Nome completo: ${nome} ${sobrenome}`)
+        }
+
+        console.log(ncomp())
+
+        console.log("---------------------------------------")
+
+        const fruta = ["maçã", "banana", "laranja"]
+
+        console.log(fruta)
+        console.log(fruta[0])
+        console.log(fruta.length)
+        fruta.push("uva")
+        console.log(fruta)
+
+        console.log("---------------------------------------")
+
+        console.log('Lista de clientes')
+        const cliente = [
+            {cli_nm:"Andre", idade:24},
+            {cli_nm:"Jheniffer", idade:20},
+            {cli_nm:"Nubia", idade:38}
+        ]
+
+        console.log(cliente)
+        console.log(cliente.length)
+
+        console.log(cliente[1].cli_nm)
+        console.log(cliente[1].idade)
+
+        cliente.push({cli_nm:"Nathan", idade:29})
+    
+        console.log(cliente.length)
+
+        console.log('Nome de todos os clientes:')
+        let n = 0
+        while (n < cliente.length) {
+            console.log(cliente[n].cli_nm)
+            n = n + 1
+        }
+    </script>
+</body>
+</html>
