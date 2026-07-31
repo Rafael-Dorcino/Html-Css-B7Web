@@ -10,7 +10,22 @@
 <body>
     <h1>Fundamentos JS + DOM</h1>
 
+    <h3>Meio de contato</h3>
 
+    <p>Seleciona o meio de contato: E-mail ou Telefone.</p>
     
+    <label for="email">Digite seu E-mail:</label><br>
+    <input type="email" name="email" id="email" placeholder="E-mail">
+    <input type="submit" value="Enviar"><br>
+    <button onclick="trocar_contato()" style="margin: 20px;">Trocar para Telefone</button>
+    
+    <div>
+        <div class="bolo">
+            <h1>Bolo de Chocolate</h1>
+            <p>Quer os engredientes pra fazer o bolo?</p>
+            <button onclick="listaEngre()">Lista dos engredientes</button>
+            <ul id="minhaLista"></ul>
+        </div>
+    </div>
 </body>
 </html>

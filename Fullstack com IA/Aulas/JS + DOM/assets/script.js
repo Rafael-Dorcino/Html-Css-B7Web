@@ -126,3 +126,53 @@ console.log(listaBolo2)
 //Introdução ao DOM e seleção de elementos com querySelector
 let titulo = document.querySelector('h1')
 titulo.style = ('color: blue; display: flex; justify-content: center;')
+
+
+
+/*
+inputEmail.getAt
+undefined
+inputEmail.getAttribute('type')
+'email'
+inputEmail.getAttribute('name')
+'email'
+inputEmail.getAttribute('id')
+'email'
+inputEmail.setAttribute('type', 'number')
+undefined
+inputEmail.getAttribute('type')
+*/
+const input = document.querySelector('#email')
+const botao = document.querySelector('button')
+const label = document.querySelector('label')
+
+function trocar_contato() {
+    
+    if(input.type === 'email'){
+        input.type = 'tel'
+        input.placeholder = "Telefone"
+        label.innerText = 'Digite seu Telefone:'
+        botao.innerText = 'Mudar para E-mail'
+    } else {
+        input.type = 'email'
+        input.placeholder= "E-mail"
+        label.innerText = 'Digite seu E-mail:'
+        botao.innerText = 'Mudar para Telefone'
+        
+    }
+}
+
+let divBolo = document.querySelector('.bolo')
+let listaHtml = document.getElementById('minhaLista')
+
+function listaEngre(){
+    listaHtml.innerHTML = '';
+    listaBolo.forEach((item) => {
+        const itemLi = document.createElement('li')
+        itemLi.textContent = item
+        listaHtml.appendChild(itemLi);
+    })
+    let textBoss = document.createElement('h3')
+    textBoss.innerText = "Mão na MASSA! Boa sorte."
+    divBolo.appendChild(textBoss)
+}

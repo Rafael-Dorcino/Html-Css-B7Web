@@ -4,3 +4,31 @@ body{
     background-color: gray;
     
 }
+
+#email::placeholder{
+    color: rgba(255, 0, 0, 0.407);
+    font-size: 14px;
+    font-weight: bold;
+}
+
+div {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+}
+
+.bolo {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    background-color: rgb(84, 42, 12);
+    padding: 20px;
+    width: 600px;
+    font-weight: bold;
+    color: white;
+}
+
+.bolo button {
+    padding: 10px;
+    font-weight: bolder;
+}
