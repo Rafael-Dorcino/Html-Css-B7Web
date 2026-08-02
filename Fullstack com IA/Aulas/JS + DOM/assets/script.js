@@ -164,6 +164,7 @@ function trocar_contato() {
 
 let divBolo = document.querySelector('.bolo')
 let listaHtml = document.getElementById('minhaLista')
+let textBoss = document.createElement('h3')
 
 function listaEngre(){
     listaHtml.innerHTML = '';
@@ -172,7 +173,70 @@ function listaEngre(){
         itemLi.textContent = item
         listaHtml.appendChild(itemLi);
     })
-    let textBoss = document.createElement('h3')
     textBoss.innerText = "Mão na MASSA! Boa sorte."
     divBolo.appendChild(textBoss)
 }
+
+let cobertura = [
+    {ing:'Leite', qtd: 50},
+    {ing:'Chocolate', qtd: 100 },
+    {ing:'Manteiga', qtd: 25},
+    {ing:'Açúcar', qtd: 75}
+]
+
+
+const listaCobertura = document.querySelector('#listaCobertura')
+const coberturaBotao = document.getElementById('cobertura')
+
+coberturaBotao.addEventListener('click', function() {
+    listaCobertura.innerHTML = '';
+    cobertura.forEach((cobert) => {
+        const cobLi = document.createElement('li')
+        cobLi.innerHTML = `<strong>${cobert.ing}</strong> - ${cobert.qtd}ml`
+        listaCobertura.appendChild(cobLi)
+    })
+})
+
+//Explicação do conceito de callback com exemplo no forEach
+//CALLBACK =  Te ligo de volta ou chamar de volta
+
+/*
+Um callback é uma função passada como argumento para outra função, que será executada mais tarde após a conclusão de uma tarefa. Os pontos principais são: execução posterior, assincronismo e reutilização de código.
+O que é um Callback?
+Função argumento: Você envia uma função dentro de outra função.
+Espera o evento: O código roda quando o processo principal termina.
+Muito usado em: Requisições de rede, cliques de botão e leitura de arquivos.
+
+Como funciona na prática
+O chamador: A função principal faz o trabalho pesado.
+O chamado: O callback avisa quando o trabalho acaba.
+Ordem: Garante que algo só aconteça depois que outra coisa estiver pronta.
+*/
+
+let form = document.querySelector('form')
+let forinput = document.querySelector('#nome')
+let enviar = document.querySelector('#enviar')
+let erro = document.querySelector('#erro')
+
+function clearInput(){
+    forinput.value = ''
+    forinput.focus()
+    forinput.classList.remove('erro')
+    erro.innerText = ''
+}
+
+function sendMessage(text){
+    let textSanitized = text.trim()
+    if(textSanitized.length > 2){
+        console.log(textSanitized)
+        clearInput()
+    } else {
+        forinput.classList.add('erro')
+        erro.innerText = 'Digitou errado, camarada!'
+    }
+}
+
+form.addEventListener('submit', (event) => {
+    event.preventDefault()
+    sendMessage(forinput.value)
+})

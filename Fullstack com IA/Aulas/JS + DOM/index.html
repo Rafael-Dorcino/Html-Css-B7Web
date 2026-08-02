@@ -23,9 +23,20 @@
         <div class="bolo">
             <h1>Bolo de Chocolate</h1>
             <p>Quer os engredientes pra fazer o bolo?</p>
-            <button onclick="listaEngre()">Lista dos engredientes</button>
+            
             <ul id="minhaLista"></ul>
+            <button onclick="listaEngre()">Lista dos ingredientes</button>
+            <ul id="listaCobertura"></ul>
+            <button id="cobertura">Cobertura</button>
         </div>
     </div>
+
+    <h1>formulario</h1>
+
+    <form>
+        <input type="text" name="nome" id="nome" class="campo">
+        <input type="submit" value="Me clique!" id="enviar" class="campo">
+        <div id="erro"></div>
+    </form>
 </body>
 </html>
