@@ -1,0 +1,160 @@
+:root {
+  --bg: #f3f4f6;
+  --card: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --green: #1f6f3c;
+  --green-dark: #16512e;
+  --danger: #d9534f;
+  --danger-dark: #b23c38;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 32px 16px;
+}
+
+.app {
+  width: 100%;
+  height: 200px;
+  max-width: 700px;
+  display: grid;
+  gap: 20px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+h1,
+h2 {
+  margin-bottom: 16px;
+}
+
+.task-form {
+  display: flex;
+  gap: 12px;
+}
+
+.task-form input {
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+.task-form button,
+.task-check,
+.task-delete {
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.task-form button {
+  padding: 12px 16px;
+  background: var(--green);
+  color: #fff;
+}
+
+.task-form button:hover,
+.task-check:hover {
+  background: var(--green-dark);
+}
+
+.task-list {
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+.task-check {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  color: #fff;
+  background: var(--green);
+}
+
+.task-text {
+  flex: 1;
+  font-size: 16px;
+  word-break: break-word;
+}
+
+.task-delete {
+  padding: 10px 12px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 14px;
+}
+
+.task-delete:hover {
+  background: var(--danger-dark);
+}
+
+.task-item.done .task-text {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.task-item.done .task-check {
+  background: var(--green-dark);
+}
+
+.empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 10px 0;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  background: #fcfcfc;
+}
+
+@media (max-width: 600px) {
+  .task-form {
+    flex-direction: column;
+  }
+
+  .task-form button {
+    width: 100%;
+  }
+
+  .task-item {
+    flex-wrap: wrap;
+  }
+
+  .task-delete {
+    margin-left: auto;
+  }
+}
