@@ -1,0 +1,27 @@
+@charset "UTF-8";
+
+* {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0px;
+    padding: 0px;
+}
+
+body {
+    background-color: cadetblue;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+}
+
+div {
+    background-color: lightgray;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    width: 1200px;
+    height: 99.9vh;
+}
+
+h1 {
+    margin: 18px;
+}
