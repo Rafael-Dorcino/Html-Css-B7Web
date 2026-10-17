@@ -13,7 +13,7 @@ body {
     align-items: center;
 }
 
-div {
+.topo {
     background-color: lightgray;
     display: flex;
     flex-flow: column nowrap;
@@ -24,4 +24,19 @@ div {
 
 h1 {
     margin: 18px;
+}
+button{
+    padding: 5px;
+    margin: 15px 0px;
+}
+.aviso{
+    display: none;
+    border: 2px solid red;
+    color: red;
+    padding: 10px;
+    background-color: white;
+}
+
+.mostrar{
+    display: block;
 }
