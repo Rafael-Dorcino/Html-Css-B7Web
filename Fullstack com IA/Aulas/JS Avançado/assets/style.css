@@ -29,7 +29,7 @@ button{
     padding: 5px;
     margin: 15px 0px;
 }
-.aviso{
+.aviso, .apiErro{
     display: none;
     border: 2px solid red;
     color: red;
@@ -39,4 +39,13 @@ button{
 
 .mostrar{
     display: block;
+}
+
+#name{
+    padding: 10px;
+    font-weight: bold;
+}
+
+#imagem{
+    width: 200px;
 }
