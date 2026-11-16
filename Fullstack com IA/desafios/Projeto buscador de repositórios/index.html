@@ -1,11 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta name="theme-color" content="#0B0B10">
+    <meta name="description" content="Encontre repositórios públicos do GitHub por palavra-chave.">
+    <title>Buscador de repositórios GitHub</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="shortcut icon" href="assets/imagens/favicon.ico" type="image/x-icon">
+    <script src="assets/script.js" defer></script>
 </head>
 <body>
-    
+    <main class="aplicativo">
+        <header class="cabecalho-pagina">
+            <p class="chamada">Explore o GitHub</p>
+            <h1>Buscador de repositórios</h1>
+            <p class="introducao">Encontre projetos públicos e descubra o que a comunidade está criando.</p>
+        </header>
+
+        <form class="cartao-busca" id="formulario-busca">
+            <label for="entrada-busca">O que você quer encontrar?</label>
+            <div class="controles-busca">
+                <input
+                    id="entrada-busca"
+                    name="termo"
+                    type="search"
+                    placeholder="Ex.: inteligência artificial"
+                    autocomplete="off"
+                    required
+                >
+                <button type="submit">Buscar</button>
+            </div>
+            <p class="dica-busca">Pressione Enter para pesquisar</p>
+        </form>
+
+        <section class="secao-resultados" aria-labelledby="titulo-resultados">
+            <div class="titulo-resultados">
+                <h2 id="titulo-resultados">Repositórios em destaque</h2>
+                <span id="contagem-resultados" class="contagem-resultados" aria-live="polite"></span>
+            </div>
+            <p id="mensagem-status" class="mensagem-status" role="status" aria-live="polite">
+                Digite um termo para encontrar repositórios.
+            </p>
+            <div id="resultados" class="lista-resultados"></div>
+        </section>
+    </main>
 </body>
 </html>
